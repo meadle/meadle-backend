@@ -15,9 +15,11 @@ app.get("/meeting", meetingRoute.getMeeting);
 app.post("/meeting", meetingRoute.postMeeting);
 
 // Get port
+// Heroku sets the port of the app as an environment variable, but if you run locally it will
+// default to 3000
 var port = process.env.PORT || 3000;
 
 // Start server
 var server = app.listen(port, function() {
-	console.log("Listening on port ", server.address().port);
+	console.log("Listening on port", server.address().port);
 });
