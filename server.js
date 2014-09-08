@@ -14,7 +14,10 @@ app.use(express.json());
 app.get("/meeting", meetingRoute.getMeeting);
 app.post("/meeting", meetingRoute.postMeeting);
 
+// Get port
+var port = process.env.PORT || 3000;
+
 // Start server
-var server = app.listen(3000, function() {
+var server = app.listen(port, function() {
 	console.log("Listening on port ", server.address().port);
 });
