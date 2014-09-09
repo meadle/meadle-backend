@@ -11,7 +11,7 @@ var app = express();
 app.use(express.json());
 
 // Defining routes
-app.get("/meeting", meetingRoute.getMeeting);
+app.get("/meeting/:meetingId", meetingRoute.getMeeting);
 app.post("/meeting", meetingRoute.postMeeting);
 
 // Get port
