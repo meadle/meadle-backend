@@ -23,7 +23,7 @@ exports.setUserLng = function(userId, lng) {
   redis.set(userId + "-longitude", lng);
 }
 
-/** MEETING DATA */
+/** PUBLIC MEETING DATA */
 
 exports.getMeetingStage = function(meetingId, callback) {
   redis.get(meetingId + "-meet-stage", function(err, result) {
@@ -83,4 +83,93 @@ exports.getMeetingLocation = function(meetingId, callback) {
 
 exports.setMeetingLocation = function(meetingId, location) {
   redis.set(meetingId + "-meet-location", location);
+}
+
+/** PRIVATE MEETING DATA */
+
+exports.getMeetingMidpointLat = function(meetingId, callback) {
+  redis.get(meetingId + "-meet-midpoint-lat", function(err, result) {
+    callback(err, result);
+  });
+}
+
+exports.setMeetingMidpointLat = function(meetingId, lat) {
+  redis.set(meetingId + "-meet-midpoint-lat", lat);
+}
+
+exports.getMeetingMidpointLng = function(meetingId, callback) {
+  redis.get(meetingId + "-meet-midpoint-lng", function(err, result) {
+    callback(err, result);
+  });
+}
+
+exports.setMeetingMidpointLng = function(meetingId, lng) {
+  redis.set(meetingId + "-meet-midpoint-lng", lng);
+}
+
+/** COMPOSITE HELPER METHODS */
+
+exports.getUserLocation = function(userId, mCallback) {
+  var location = {}
+
+  async.parallel(
+    [
+      function(callback) {
+        exports.getUserLat(userId, function(err, result) {
+          location.lat = result;
+          callback(err, result);
+        })
+      },
+      function(callback) {
+        exports.getUserLng(userId, function(err, result) {
+          location.lng = result;
+          callback(err, result);
+        })
+      }
+    ],
+    function(err, results) {
+      mCallback(err, location);
+    }
+  )
+
+}
+
+exports.getInitiatorLocation = function(meetingId, callback) {
+
+  exports.getMeetingInitiator(meetingId, function(err, result) {
+
+    var userId = result;
+    exports.getUserLocation(userId, function(err, result) {
+      callback(err, result);
+    });
+
+  });
+
+}
+
+exports.getMeetingMidpoint = function(meetingId, mCallback) {
+
+  var location = {}
+
+  async.parallel(
+    [
+      function(callback) {
+        exports.getMeetingMidpointLat(meetingId, function(err, result) {
+          location.lat = result;
+          callback(err, result);
+        });
+      },
+      function(callback) {
+        exports.getMeetingMidpointLng(meetingId, function(err, result) {
+          location.lng = result;
+          callback(err, result);
+        });
+      }
+    ],
+
+    function(err, results) {
+      mCallback(err, location);
+    }
+  );
+
 }

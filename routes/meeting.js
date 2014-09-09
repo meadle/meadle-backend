@@ -1,11 +1,15 @@
 
 var async = require("async");
-var redis = require("../redis");
+var redis = require("../util/redis_wrapper");
+var geo = require("../util/geo");
 
 exports.getMeeting = function(req, res) {
 
 	// Extract the meeting id from the request parameters
 	var meetingId = req.param("meetingId")
+
+	// Extract the user Id
+	var userId = req.param("me")
 
 	// Start extracting information from redis
 	var meeting = { meeting: {} }
@@ -28,13 +32,16 @@ exports.getMeeting = function(req, res) {
 				redis.getMeetingCategory(meetingId, function(err, result) {
 					meeting.meeting.category = result;
 					callback(err, result);
-				})
+				});
 			},
 			function(callback) {
 				redis.getMeetingLocation(meetingId, function(err, result) {
 					meeting.meeting.location = result;
 					callback(err, result);
-				})
+				});
+			},
+			function(callback) {
+				redis.getMeetingMidpoint
 			}
 		],
 
@@ -72,6 +79,41 @@ exports.postMeeting = function(req, res) {
 
 }
 
-var onGetMeetingStage = function(stage) {
+exports.joinMeeting = function(req, res) {
+
+	// Extract from post data
+	var meetingId = req.param("meetingId");
+	var me = req.body.me;
+	var lat = req.body.lat;
+	var lng = req.body.lng;
+
+	// Get the meeting's stage and only continue if it is 1
+	var stage = redis.getMeetingStage(meetingId, function(err, result) {
+		if (stage === 1) {
+
+			// Increment the meeting's stage
+			redis.setMeetingStage(meetingId, 2);
+
+			// Add information about this user to redis
+			redis.setUserLat(me, lat);
+			redis.setUserLng(me, lng);
+
+			// Add this user to the meeting
+			redis.setMeetingJoiner(meetingId, me);
+
+			// Get the first user's location
+			var location = redis.getInitiatorLocation(meetingId, function(err, result) {
+
+				// Calculate the midpoint between the two users
+				var midpoint = geo.getMidpoint(lat, lng, location.lat, location.lng);
+
+				// Store it in redis
+				redis.setMeetingMidpointLat(midpoint.lat);
+				redis.setMeetingMidpointLng(midpoint.lng);
+
+			});
+
+		}
+	});
 
 }

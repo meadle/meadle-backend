@@ -1,7 +1,6 @@
 
 // Imports
 var express = require('express');
-var redis = require('redis');
 
 // Routes
 var meetingRoute = require('./routes/meeting');
@@ -13,6 +12,7 @@ app.use(express.json());
 // Defining routes
 app.get("/meeting/:meetingId", meetingRoute.getMeeting);
 app.post("/meeting", meetingRoute.postMeeting);
+app.put("/meeting/:meetingId/join", meetingRoute.joinMeeting);
 
 // Get port
 // Heroku sets the port of the app as an environment variable, but if you run locally it will
