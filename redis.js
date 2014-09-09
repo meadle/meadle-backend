@@ -19,7 +19,7 @@ exports.getUserLng = function(userId, callback) {
   });
 }
 
-exports.setUsrLng = function(userId, lng) {
+exports.setUserLng = function(userId, lng) {
   redis.set(userId + "-longitude", lng);
 }
 
@@ -63,4 +63,24 @@ exports.getMeetingTime = function(meetingId, callback) {
 
 exports.setMeetingTime = function(meetingId, time) {
   redis.set(meetingId + "-meet-time", time);
+}
+
+exports.getMeetingCategory = function(meetingId, callback) {
+  redis.get(meetingId + "-meet-category", function(err, result) {
+    callback(err, result);
+  });
+}
+
+exports.setMeetingCategory = function(meetingId, category) {
+  redis.set(meetingId + "-meet-category", category);
+}
+
+exports.getMeetingLocation = function(meetingId, callback) {
+  redis.get(meetingId + "-meet-location", function(err, result) {
+    callback(err, result);
+  });
+}
+
+exports.setMeetingLocation = function(meetingId, location) {
+  redis.set(meetingId + "-meet-location", location);
 }

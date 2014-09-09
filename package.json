@@ -4,6 +4,6 @@
 	"dependencies" : {
 		"express" : "3.3.x",
 		"redis": "*",
-		"pg": "*"
+		"async":"*"
 	}
 }

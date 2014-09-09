@@ -1,5 +1,6 @@
 
-var redis = require("../redis")
+var async = require("async");
+var redis = require("../redis");
 
 exports.getMeeting = function(req, res) {
 
@@ -8,11 +9,41 @@ exports.getMeeting = function(req, res) {
 
 	// Start extracting information from redis
 	var meeting = {}
+	async.parallel(
 
-	var lat = redis.getUserLat("123", function(err, result) {
+		[
+			function(callback) {
+				redis.getMeetingStage(meetingId, function(err, result) {
+					meeting.stage = result;
+					callback(err, result);
+				});
+			},
+			function(callback) {
+				redis.getMeetingTime(meetingId, function(err, result) {
+					meeting.meeting.datetime = result;
+					callback(err, result);
+				});
+			},
+			function(callback) {
+				redis.getMeetingCategory(meetingId, function(err, result) {
+					meeting.meeting.category = result;
+					callback(err, result);
+				})
+			},
+			function(callback) {
+				redis.getMeetingLcation(meetingId, function(err, result) {
+					meeting.meeting.location = result;
+					callback(err, result);
+				})
+			}
+		],
 
-		res.send(result);
-	});
+		function(err, results) {
+			meeting.id = meetingId;
+			res.send(meeting);
+		}
+
+	);
 
 }
 
@@ -38,5 +69,9 @@ exports.postMeeting = function(req, res) {
 
 	// Turn the meeting ID to json and write it to the client
 	res.send({"meetingId": mid})
+
+}
+
+var onGetMeetingStage = function(stage) {
 
 }
