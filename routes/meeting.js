@@ -35,7 +35,7 @@ exports.getMeeting = function(req, res) {
 				});
 			},
 			function(callback) {
-				redis.getMeetingLocation(meetingId, function(err, result) {
+				redis.getMeetingMidpoint(meetingId, function(err, result) {
 					meeting.meeting.location = result;
 					callback(err, result);
 				});
