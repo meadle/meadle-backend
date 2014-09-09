@@ -8,7 +8,7 @@ exports.getMeeting = function(req, res) {
 	var meetingId = req.param("meetingId")
 
 	// Start extracting information from redis
-	var meeting = {}
+	var meeting = { meeting: {} }
 	async.parallel(
 
 		[
@@ -31,7 +31,7 @@ exports.getMeeting = function(req, res) {
 				})
 			},
 			function(callback) {
-				redis.getMeetingLcation(meetingId, function(err, result) {
+				redis.getMeetingLocation(meetingId, function(err, result) {
 					meeting.meeting.location = result;
 					callback(err, result);
 				})
