@@ -4,6 +4,7 @@ var express = require('express');
 
 // Routes
 var meetingRoute = require('./routes/meeting');
+var mongo = require('./util/mongo_init');
 
 // Express
 var app = express();
@@ -13,6 +14,9 @@ app.use(express.json());
 app.get("/meeting/:meetingId", meetingRoute.getMeeting);
 app.post("/meeting", meetingRoute.postMeeting);
 app.put("/meeting/:meetingId/join", meetingRoute.joinMeeting);
+
+// Set up mongo db
+mongo.init();
 
 // Get port
 // Heroku sets the port of the app as an environment variable, but if you run locally it will

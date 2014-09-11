@@ -1,5 +1,6 @@
 
 var async = require("async");
+var mongoUsers = require("../util/mongo_users");
 var geo = require("../util/geo");
 
 exports.getMeeting = function(req, res) {
@@ -10,6 +11,9 @@ exports.getMeeting = function(req, res) {
 	// Extract the user Id
 	var userId = req.param("me")
 
+	mongoUsers.getUser(userId, function(err, result) {
+		res.send(result);
+	});
 
 }
 
