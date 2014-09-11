@@ -1,6 +1,8 @@
 
 var async = require("async");
+var meetingModel = require("../models/meeting");
 var mongoUsers = require("../util/mongo_users");
+var mongoMeetings = require("../util/mongo_meetings");
 var geo = require("../util/geo");
 
 exports.getMeeting = function(req, res) {
@@ -9,10 +11,23 @@ exports.getMeeting = function(req, res) {
 	var meetingId = req.param("meetingId")
 
 	// Extract the user Id
-	var userId = req.param("me")
+	var userId = req.param("userId")
 
-	mongoUsers.getUser(userId, function(err, result) {
-		res.send(result);
+	// Query mongo for the meeting
+	mongoMeetings.getMeeting(meetingId, function(err, result) {
+
+		// Check to ensure the requesting user has permission to request the meeting
+		var members = result.members;
+		if (members.indexOf(userId) === -1) {
+			res.status(401).send("Unauthorized"); return;
+		}
+
+		// Filter the meeting of any sensitive information
+		var meeting = meetingModel.filter(result);
+
+		// Send the result to the client
+		res.status(200).send(meeting);
+
 	});
 
 }
@@ -20,13 +35,22 @@ exports.getMeeting = function(req, res) {
 exports.postMeeting = function(req, res) {
 
 	// Extract data from the post data
-	var me = req.body.me;
+	var me = req.body.userId;
 	var lat = req.body.lat;
 	var lng = req.body.lng;
 	var datetime = req.body.datetime;
 
 	// Generate a random meeting id
 	var mid = Math.random().toString(36).substring(5);
+
+	// Create the user in mongo
+	mongoUsers.createUser({"userId": me, "lat": lat, "lng": lng});
+
+	// Create the meeting
+	mongoMeetings.createMeeting({"meetingId": mid, "datetime": datetime, "members": [me]});
+
+	// Pass back the meeting id to the client
+	res.send({"meetingId": mid});
 
 }
 

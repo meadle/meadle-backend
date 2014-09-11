@@ -4,7 +4,7 @@
 exports.filter = function(meeting) {
 
   var newMeeting = {}
-  newMeeting.id = meeting.id;
+  newMeeting.meetingId = meeting.meetingId;
   newMeeting.datetime = meeting.datetime;
   newMeeting.topLocations = meeting.topLocations;
   newMeeting.location = meeting.location;
