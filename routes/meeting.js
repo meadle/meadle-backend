@@ -50,7 +50,7 @@ exports.postMeeting = function(req, res) {
 	mongoMeetings.createMeeting({"meetingId": mid, "datetime": datetime, "members": [me]});
 
 	// Pass back the meeting id to the client
-	res.send({"meetingId": mid});
+	res.status(201).send({"meetingId": mid});
 
 }
 
