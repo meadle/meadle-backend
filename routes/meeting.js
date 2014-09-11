@@ -77,7 +77,7 @@ exports.joinMeeting = function(req, res) {
 			}
 
 			// Add the member to the meeting
-			mongoMeeting.addMember(member, meetingId);
+			mongoMeetings.addMember(member, meetingId);
 
 			// TODO Calculate midpoint and GCM them
 
