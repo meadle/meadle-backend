@@ -56,7 +56,7 @@ exports.postMeeting = function(req, res) {
 	mongoMeetings.createMeeting({"meetingId": mid, "datetime": datetime, "members": [me]});
 
 	// Pass back the meeting id to the client
-	res.status(201).send({"meetingId": mid});
+	res.status(202).send({"meetingId": mid});
 
 }
 
@@ -83,6 +83,9 @@ exports.joinMeeting = function(req, res) {
 			mongoMeetings.addMember(me, meetingId);
 
 			// TODO Calculate midpoint and GCM them
+
+
+			res.status(202).send("A-OK");
 
 	});
 
