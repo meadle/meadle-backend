@@ -22,3 +22,19 @@ exports.createMeeting = function(meeting) {
   });
 
 }
+
+/*
+ * This should have the same format as above, but should retain the
+ * _id field that mongo adds so we can update it in the database.
+ */
+exports.setMeetingMembers = function(meetingId, members) {
+
+  collection.update({"meetingId": meetingId}, {"$set": {"members": members}}, function(err, result) {
+
+    if (!err) {
+      console.log("Members set");
+    }
+
+  });
+
+}

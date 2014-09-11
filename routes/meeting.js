@@ -62,8 +62,29 @@ exports.joinMeeting = function(req, res) {
 
 	// Extract from post data
 	var meetingId = req.param("meetingId");
-	var me = req.body.me;
+	var me = req.body.userId;
 	var lat = req.body.lat;
 	var lng = req.body.lng;
+
+	// Create the user in mongo
+	mongoUsers.createUser({"userId": me, "lat": lat, "lng": lng});
+
+	// Get the meeting in question
+	var meeting = mongoMeetings.getMeeting(meetingId, function(err, result) {
+
+			if (err) {
+				res.status(400).send("An error occured in mongo."); return;
+			}
+
+			// Add the user to the list of members
+			result.members.push(me);
+			var newMembers = result.members;
+
+			// Update the list of members in mongo
+			mongoMeetings.setMeetingMembers(meetingId, newMembers);
+
+			// TODO Calculate midpoint and GCM them
+
+	});
 
 }
