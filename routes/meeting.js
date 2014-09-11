@@ -6,6 +6,7 @@ var mongoMeetings = require("../util/mongo_meetings");
 var geo = require("../util/geo");
 
 exports.getMeeting = function(req, res) {
+	console.log("GET /meeting");
 
 	// Extract the meeting id from the request parameters
 	var meetingId = req.param("meetingId")
@@ -37,6 +38,7 @@ exports.getMeeting = function(req, res) {
 }
 
 exports.postMeeting = function(req, res) {
+	console.log("POST /meeting");
 
 	// Extract data from the post data
 	var me = req.body.userId;
@@ -59,6 +61,7 @@ exports.postMeeting = function(req, res) {
 }
 
 exports.joinMeeting = function(req, res) {
+	console.log("PUT /meeting/{}/join");
 
 	// Extract from post data
 	var meetingId = req.param("meetingId");
