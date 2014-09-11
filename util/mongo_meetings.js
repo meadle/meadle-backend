@@ -31,10 +31,6 @@ exports.setMeetingMembers = function(meetingId, members) {
 
   collection.update({"meetingId": meetingId}, {"$set": {"members": members}}, function(err, result) {
 
-    if (!err) {
-      console.log("Members set");
-    }
-
   });
 
 }
