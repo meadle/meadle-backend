@@ -27,6 +27,14 @@ exports.createUser = function(userObject) {
 
   // TODO: Add validation
 
-  collection.insert(userObject);
+  collection.insert(userObject, function(err, result) {
+
+    if (err) {
+      console.log("There's a snake in my boots!");
+    } else {
+      console.log("User creation successful");
+    }
+
+  });
 
 }
