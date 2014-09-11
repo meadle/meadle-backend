@@ -17,6 +17,8 @@ exports.createMeeting = function(meeting) {
 
   // TODO: Add validation
 
-  collection.insert(meeting);
+  collection.insert(meeting, function(err, result) {
+    console.log("Meeting " + meeting.meetingId + " inserted into mongo.");
+  });
 
 }
