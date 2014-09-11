@@ -1,18 +1,31 @@
 
 See the wiki for detailed information on the format of our api.
 
-Setting Up
-==========
+Pre-Reqs
+========
 
-1. Install `nodejs` on your computer.
+1. `brew install node`
 
-2. `git clone` repository
+2. `brew install mongo`
 
-3. `npm install`
 
-4. `node server.js`
+Setting It Up
+=============
 
-5. Visit `localhost:3000` to confirm it works
+1. `git clone` repository
+
+2. `npm install`
+
+3. In a separate terminal, run `mongo`
+
+
+Running
+=======
+
+1. `node server.js`
+
+2. Visit `localhost:3000` to confirm it works
+
 
 Deploying Changes
 =================
