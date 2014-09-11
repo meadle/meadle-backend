@@ -76,12 +76,8 @@ exports.joinMeeting = function(req, res) {
 				res.status(400).send("An error occured in mongo."); return;
 			}
 
-			// Add the user to the list of members
-			result.members.push(me);
-			var newMembers = result.members;
-
-			// Update the list of members in mongo
-			mongoMeetings.setMeetingMembers(meetingId, newMembers);
+			// Add the member to the meeting
+			mongoMeeting.addMember(member, meetingId);
 
 			// TODO Calculate midpoint and GCM them
 

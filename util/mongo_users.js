@@ -3,7 +3,16 @@ var collection = require("mongoskin").db(process.env.MONGOLAB_URI || "mongodb://
 
 exports.getUser = function(userId, callback) {
 
-  collection.findOne({"userId": userId}, callback);
+  collection.findOne({"userId": userId}, function(err, result) {
+
+    if (err) {
+      console.log("Error while reading user " + userId + " from database");
+    } else {
+      console.log("User get from database complete");
+      callback(err, result);
+    }
+
+  });
 
 }
 

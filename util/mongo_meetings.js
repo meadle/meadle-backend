@@ -3,7 +3,16 @@ var collection = require("mongoskin").db(process.env.MONGOLAB_URI || "mongodb://
 
 exports.getMeeting = function(meetingId, callback) {
 
-  collection.findOne({"meetingId": meetingId}, callback);
+  collection.findOne({"meetingId": meetingId}, function(err, result) {
+
+    if (err) {
+      console.log("Error while reading meeting " + meetingId + " from database");
+    } else {
+      console.log("Database get complete");
+      callback(err, result);
+    }
+
+  });
 
 }
 
@@ -18,7 +27,13 @@ exports.createMeeting = function(meeting) {
   // TODO: Add validation
 
   collection.insert(meeting, function(err, result) {
-    console.log("Meeting " + meeting.meetingId + " inserted into mongo.");
+
+    if (err) {
+      console.log("Error while creating meeting.");
+    } else {
+      console.log("Meeting " + meeting.meetingId + " inserted into database");
+    }
+
   });
 
 }
@@ -27,10 +42,22 @@ exports.createMeeting = function(meeting) {
  * This should have the same format as above, but should retain the
  * _id field that mongo adds so we can update it in the database.
  */
-exports.setMeetingMembers = function(meetingId, members) {
+exports.addMember = function(member, meetingId) {
 
-  collection.update({"meetingId": meetingId}, {"$set": {"members": members}}, function(err, result) {
+  collection.update({"meetingId": meetingId},
+    {
+      "$push": {
+        "members": member
+      }
+    }, function(err, result) {
 
-  });
+      if (err) {
+          console.log("Error adding " + member + " to meeting " + meetingId);
+      } else {
+          console.log("Member " + member + " added to group")
+      }
+
+    }
+  );
 
 }
