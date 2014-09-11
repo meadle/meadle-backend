@@ -16,6 +16,10 @@ exports.getMeeting = function(req, res) {
 	// Query mongo for the meeting
 	mongoMeetings.getMeeting(meetingId, function(err, result) {
 
+		if (err) {
+			res.status(400).send("An error occured in mongo."); return;
+		}
+
 		// Check to ensure the requesting user has permission to request the meeting
 		var members = result.members;
 		if (members.indexOf(userId) === -1) {
