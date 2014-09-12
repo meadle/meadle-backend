@@ -61,3 +61,23 @@ exports.addMember = function(member, meetingId) {
   );
 
 }
+
+exports.setMidpoint = function(latitude, longitude, meetingId) {
+
+  collection.update({"meetingId": meetingId},
+  {
+    "$set": {
+      "lat": latitude,
+      "lng": longitude
+    }
+  }, function(err, result) {
+
+    if (err) {
+      console.log("Error setting midpoint on meeting " + meetingId);
+    } else {
+      console.log("Midpoint set in database successful");
+    }
+
+  });
+
+}
