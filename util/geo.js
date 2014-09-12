@@ -12,50 +12,18 @@ exports.calcAndStoreMidpoint = function(meetingId) {
       console.log("Error while querying for meeting during midpoint calculation"); return;
     }
 
-    // Full member data for each meeting are stored in an array
-    var members = [];
+    async.map(result.members, function(member, callback) {
 
-    // Generate a query function for each member in the meeting
-    var queries = [];
-    result.members.forEach(function(a) {
-
-      if (!a) {
-        return;
-      }
-
-      queries.push(function(callback) {
-        mongoUsers.getUser(a, function(err, result) {
-
-          if (err) {
-            console.log("Good luck debugging this one buddy");
-          } else {
-            console.log("Adding " + result);
-            members.push(result);
-            callback(result);
-          }
-
-        });
+      mongoUsers.getUser(member, function(err, result) {
+        callback(err, result);
       });
+
+    }, function(err, results) {
+
+      var midpoint = exports.getMidpoint(results[0].lat, results[0].lng, results[1].lat, results[1].lng);
+      mongoMeetings.setMidpoint(midpoint.lat, midpoint.lng, meetingId);
+
     });
-
-    // Then execute each of the functions we just generated
-    async.parallel(queries,
-
-      function(err, results) {
-
-        // For each member, calculate their midpoint
-        // Right now this will only calculate the midpoint between... uhh... the first two
-        // But eventually we could improve this to work for an arbitrary number of people
-
-        var m1 = members[0];
-        var m2 = members[1];
-        var midpoint = exports.getMidpoint(m1.lat, m1.lng, m2.lat, m2.lng);
-
-        mongoMeetings.setMidpoint(midpoint.lat, midpoint.lng, meetingId);
-
-      }
-
-    );
 
   });
 
