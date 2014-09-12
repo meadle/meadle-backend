@@ -1,4 +1,5 @@
 
+var async = require("async");
 var mongoMeetings = require("./mongo_meetings");
 var mongoUsers = require("./mongo_users");
 

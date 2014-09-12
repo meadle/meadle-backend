@@ -1,5 +1,4 @@
 
-var async = require("async");
 var collection = require("mongoskin").db(process.env.MONGOLAB_URI || "mongodb://localhost:27017/meadle").collection("meetings");
 
 exports.getMeeting = function(meetingId, callback) {
