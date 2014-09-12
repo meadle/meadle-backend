@@ -29,6 +29,7 @@ exports.calcAndStoreMidpoint = function(meetingId) {
           if (err) {
             console.log("Good luck debugging this one buddy");
           } else {
+            console.log("Adding " + result);
             members.push(result);
             callback(result);
           }
