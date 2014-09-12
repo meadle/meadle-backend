@@ -83,7 +83,7 @@ exports.joinMeeting = function(req, res) {
 			mongoMeetings.addMember(me, meetingId);
 
 			// Calculate and store the midpoint in mongo
-			geo.calAndStoreMidpoint(meetingId);
+			geo.callAndStoreMidpoint(meetingId);
 
 			// TODO Calculate midpoint and GCM them
 
