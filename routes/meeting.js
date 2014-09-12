@@ -21,6 +21,10 @@ exports.getMeeting = function(req, res) {
 			res.status(400).send("An error occured in mongo."); return;
 		}
 
+		if (!result) {
+			res.status(404).send({"error":404, "message": "The requested meadle could not be found."}); return;
+		}
+
 		// Check to ensure the requesting user has permission to request the meeting
 		var members = result.members;
 		if (members.indexOf(userId) === -1) {
