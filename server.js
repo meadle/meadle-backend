@@ -6,9 +6,14 @@ var express = require('express');
 var meetingRoute = require('./routes/meeting');
 var mongo = require('./util/mongo_init');
 
+// Logging
+var log4js = require('log4js')
+var logger = log4js.getLogger();
+
 // Express
 var app = express();
 app.use(express.json());
+app.use(log4js.connectLogger(logger));
 
 // Defining routes
 app.get("/meeting/:meetingId", meetingRoute.getMeeting);
