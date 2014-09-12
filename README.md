@@ -16,7 +16,7 @@ Setting It Up
 
 2. `npm install`
 
-3. In a separate terminal, run `mongo`
+3. In a separate terminal, run `mongod`
 
 
 Running
