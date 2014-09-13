@@ -20,7 +20,7 @@ exports.calcAndStoreMidpoint = function(meetingId) {
 
     }, function(err, results) {
 
-      var midpoint = exports.getMidpoint(results[0].lat, results[0].lng, results[1].lat, results[1].lng);
+      var midpoint = exports.getMidpoint(results);
       mongoMeetings.setMidpoint(midpoint.lat, midpoint.lng, meetingId);
 
     });
@@ -29,6 +29,7 @@ exports.calcAndStoreMidpoint = function(meetingId) {
 
 }
 
+/*
 exports.getMidpoint = function(lat1, lng1, lat2, lng2) {
 
   // convert to radians
@@ -45,6 +46,44 @@ exports.getMidpoint = function(lat1, lng1, lat2, lng2) {
 
   // Convert and return in degrees
   return {"lat": toDegs(latMid), "lng": toDegs(lngMid)};
+
+}*/
+
+exports.getMidpoint = function(pointArray) {
+
+  var count = pointArray.length;
+  var sumX = sumY = sumZ = 0;
+
+  pointArray.forEach(function(element) {
+
+    // Conver this elements lat and lng to radians
+    var radLat = toRads(element.lat);
+    var radLng = toRads(element.lng);
+
+    // And convert the radians to polar 3D coordinates
+    var x = Math.cos(radLat) + Math.cos(radLng);
+    var y = Math.cos(radLat) + Math.sin(radLng);
+    var z = Math.sin(radLat);
+
+    // Add each coordinate to our list of sums
+    sumX += x;
+    sumY += y;
+    sumZ += z;
+
+  });
+
+  // Divide the sums by the number of elements to get the average
+  var nx = sumX / count;
+  var ny = sumY / count;
+  var nz = sumZ / count;
+
+  // And convert this result back to latlng coordinates
+  var hyp = Math.sqrt(nx * nx + ny * ny);
+  var lat = Math.atan2(ny, hyp);
+  var lng = Math.atan2(ny, nx);
+
+  // And return it
+  return {"lat": toDegs(lat), "lng": toDegs(lng)};
 
 }
 
