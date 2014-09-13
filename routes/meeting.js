@@ -77,10 +77,14 @@ exports.joinMeeting = function(req, res) {
 	mongoUsers.createUser({"userId": me, "lat": lat, "lng": lng});
 
 	// Get the meeting in question
-	var meeting = mongoMeetings.getMeeting(meetingId, function(err, result) {
+	mongoMeetings.getMeeting(meetingId, function(err, result) {
 
 			if (err) {
 				res.status(400).send("An error occured in mongo."); return;
+			}
+
+			if (result.members.length >= 2) {
+				res.status(403).send({"error": 403, "message": "Meetings can only have two participants."}); return;
 			}
 
 			// Add the member to the meeting
