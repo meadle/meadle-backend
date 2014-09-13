@@ -6,6 +6,7 @@
     "express": "3.3.x",
     "log4js": "^0.6.21",
     "mongodb": "*",
-    "mongoskin": "*"
+    "mongoskin": "*",
+    "yelp": "*"
   }
 }
