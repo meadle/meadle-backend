@@ -119,7 +119,7 @@ exports.joinMeeting = function(req, res) {
 				}
 
 				// Query yelp for the businesses
-				yelp.getBusinesses(result, function(err, result) {
+				yelp.getBusinesses(result, function(err, results) {
 
 					if (err) {
 						logger.error("An error was thrown during the yelp API call");
@@ -136,5 +136,7 @@ exports.joinMeeting = function(req, res) {
 			});
 
 	});
+
+	res.status(202).send("Accepted");
 
 }

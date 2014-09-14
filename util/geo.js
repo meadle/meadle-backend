@@ -64,13 +64,13 @@ exports.getMidpoint = function(pointArray) {
 
   pointArray.forEach(function(element) {
 
-    // Conver this elements lat and lng to radians
+    // Convert this elements lat and lng to radians
     var radLat = toRads(element.lat);
     var radLng = toRads(element.lng);
 
     // And convert the radians to polar 3D coordinates
-    var x = Math.cos(radLat) + Math.cos(radLng);
-    var y = Math.cos(radLat) + Math.sin(radLng);
+    var x = Math.cos(radLat) * Math.cos(radLng);
+    var y = Math.cos(radLat) * Math.sin(radLng);
     var z = Math.sin(radLat);
 
     // Add each coordinate to our list of sums
@@ -87,7 +87,7 @@ exports.getMidpoint = function(pointArray) {
 
   // And convert this result back to latlng coordinates
   var hyp = Math.sqrt(nx * nx + ny * ny);
-  var lat = Math.atan2(ny, hyp);
+  var lat = Math.atan2(nz, hyp);
   var lng = Math.atan2(ny, nx);
 
   // And return it
