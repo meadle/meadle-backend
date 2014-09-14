@@ -30,7 +30,7 @@ exports.createUser = function(userObject) {
   collection.insert(userObject, function(err, result) {
 
     if (err) {
-      console.log("There's a snake in my boots!");
+      console.log("Error creating user in mongo");
     } else {
       console.log("User creation successful");
     }

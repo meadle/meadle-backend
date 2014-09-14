@@ -3,7 +3,10 @@ var async = require("async");
 var mongoMeetings = require("./mongo_meetings");
 var mongoUsers = require("./mongo_users");
 
-exports.calcAndStoreMidpoint = function(meetingId) {
+/** This function calculates the midpoint for a given meeting then stores that value
+ *  in that meetings Mongo document. It also returns that value through the callback
+ *  passed in for immediate usage if desired. */
+exports.calcAndStoreMidpoint = function(meetingId, mCallback) {
 
   // Query for the meeting object
   mongoMeetings.getMeeting(meetingId, function(err, result) {
@@ -22,6 +25,8 @@ exports.calcAndStoreMidpoint = function(meetingId) {
 
       var midpoint = exports.getMidpoint(results);
       mongoMeetings.setMidpoint(midpoint.lat, midpoint.lng, meetingId);
+
+      mCallback(err, midpoint);
 
     });
 

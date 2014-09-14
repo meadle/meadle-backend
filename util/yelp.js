@@ -28,9 +28,11 @@ exports.getBusinesses = function(point, callback) {
     function(err, result) {
 
       if (err) {
-        callback(err, null);
+        callback(err, null); return;
       }
 
+      console.log(result);
+      
       // Extract the exact information we need for each result
       var items = [];
       result.businesses.forEach(function(item) {

@@ -1,12 +1,12 @@
 
 var async = require("async");
+var geo = require("../util/geo");
 var meetingModel = require("../models/meeting");
 var mongoUsers = require("../util/mongo_users");
 var mongoMeetings = require("../util/mongo_meetings");
-var geo = require("../util/geo");
+var yelp = require("../util/yelp");
 
 exports.getMeeting = function(req, res) {
-	console.log("GET /meeting");
 
 	// Extract the meeting id from the request parameters
 	var meetingId = req.param("meetingId")
@@ -42,7 +42,6 @@ exports.getMeeting = function(req, res) {
 }
 
 exports.postMeeting = function(req, res) {
-	console.log("POST /meeting");
 
 	// Extract data from the post data
 	var me = req.body.userId;
@@ -65,7 +64,6 @@ exports.postMeeting = function(req, res) {
 }
 
 exports.joinMeeting = function(req, res) {
-	console.log("PUT /meeting/{}/join");
 
 	// Extract from post data
 	var meetingId = req.param("meetingId");
@@ -91,13 +89,27 @@ exports.joinMeeting = function(req, res) {
 			mongoMeetings.addMember(me, meetingId);
 
 			// Calculate and store the midpoint in mongo
-			geo.calcAndStoreMidpoint(meetingId);
+			geo.calcAndStoreMidpoint(meetingId, function(err, result) {
 
-			// TODO Calculate midpoint and GCM them
+				// We just use a callback here to ensure we don't move foreward until the midpoint is in mongo
+				// Get the list of yelp businesses
+				yelp.getBusinesses(result, function(err, result) {
 
+					if (err) {
+						console.log("Error while getting yelp businesses");
+						console.log(err);
+						return;
+					}
 
-			res.status(202).send("A-OK");
+					// Results should be a list of business IDs. Store them in mongo.
+					mongoMeetings.setTopLocations(meetingId, results);
+
+				});
+
+			});
 
 	});
+
+	res.status(202).send("A-OK");
 
 }

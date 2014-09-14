@@ -81,3 +81,22 @@ exports.setMidpoint = function(latitude, longitude, meetingId) {
   });
 
 }
+
+exports.setTopLocations = function(meetingId, locations) {
+
+  collection.update({"meetingId": meetingId},
+    {
+      "$set": {
+        "topLocations": locations
+      }
+    }, function(err, result) {
+
+      if (err) {
+        console.log("Error setting top locations in mongo.");
+      } else {
+        console.log("Top locations set for meeting " + meetingId);
+      }
+
+  });
+
+}
