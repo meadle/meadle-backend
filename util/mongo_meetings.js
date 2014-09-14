@@ -1,15 +1,17 @@
 
 var collection = require("mongoskin").db(process.env.MONGOLAB_URI || "mongodb://localhost:27017/meadle").collection("meetings");
+var logger = require("log4js").getLogger();
 
 exports.getMeeting = function(meetingId, callback) {
 
   collection.findOne({"meetingId": meetingId}, function(err, result) {
 
     if (err) {
-      console.log("Error while reading meeting " + meetingId + " from database");
+      logger.error("Error while reading meeting " + meetingId + " from database.");
+      logger.error(err);
+      callback(err, null); return;
     } else {
-      console.log("Database get complete");
-      callback(err, result);
+      callback(err, result); return;
     }
 
   });
@@ -29,9 +31,7 @@ exports.createMeeting = function(meeting) {
   collection.insert(meeting, function(err, result) {
 
     if (err) {
-      console.log("Error while creating meeting.");
-    } else {
-      console.log("Meeting " + meeting.meetingId + " inserted into database");
+      logger.error("Error while creating meeting in mongo.");
     }
 
   });
@@ -52,9 +52,7 @@ exports.addMember = function(member, meetingId) {
     }, function(err, result) {
 
       if (err) {
-          console.log("Error adding " + member + " to meeting " + meetingId);
-      } else {
-          console.log("Member " + member + " added to group")
+          logger.error("Error adding " + member + " to meeting " + meetingId + " in mongo.");
       }
 
     }
@@ -73,9 +71,7 @@ exports.setMidpoint = function(latitude, longitude, meetingId) {
   }, function(err, result) {
 
     if (err) {
-      console.log("Error setting midpoint on meeting " + meetingId);
-    } else {
-      console.log("Midpoint set in database successful");
+      logger.error("Error setting midpoint on meeting " + meetingId + " in mongo.");
     }
 
   });
@@ -92,9 +88,7 @@ exports.setTopLocations = function(meetingId, locations) {
     }, function(err, result) {
 
       if (err) {
-        console.log("Error setting top locations in mongo.");
-      } else {
-        console.log("Top locations set for meeting " + meetingId);
+        logger.error("Error setting top locations for " + meetingId + " in mongo.");
       }
 
   });

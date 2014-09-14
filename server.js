@@ -2,19 +2,16 @@
 // Imports
 var express = require('express');
 var log4js = require('log4js');
+var logger = log4js.getLogger();
 var tests = require('./test/tests');
 
 // Routes
 var meetingRoute = require('./routes/meeting');
 var mongo = require('./util/mongo_init');
 
-// Logging
-var logger = log4js.getLogger();
-
 // Express
 var app = express();
 app.use(express.json());
-app.use(log4js.connectLogger(logger));
 
 // Defining routes
 app.get("/meeting/:meetingId", meetingRoute.getMeeting);
@@ -35,5 +32,5 @@ var port = process.env.PORT || 3000;
 
 // Start server
 var server = app.listen(port, function() {
-	console.log("Listening on port", server.address().port);
+	logger.info("Listening on port " + server.address().port);
 });

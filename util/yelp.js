@@ -1,5 +1,6 @@
 
 var yelpModel = require('../models/yelp_business');
+var logger = require("log4js").getLogger();
 
 // This stuff should be removed if we ever eventually go open source, obviously
 var CONSUMER_KEY = "nvpSLg2B6XPhM-z6_XA-XQ";
@@ -11,6 +12,7 @@ var TOKEN_SECRET = "HFHxXEbUqhv_t1d2cpxmU6s9rC0";
 var SEARCH_RADIUS_M = 5000;
 
 // Create the yelp API client
+logger.trace("Initializing yelp API client");
 var yelp = require("yelp").createClient({
   "consumer_key": CONSUMER_KEY,
   "consumer_secret": CONSUMER_SECRET,
@@ -19,6 +21,7 @@ var yelp = require("yelp").createClient({
 });
 
 exports.getBusinesses = function(point, callback) {
+  logger.trace("yelp.getBusinesses() : Getting businesses around " + point.lat + ", " + point.lng);
 
   yelp.search(
     {
@@ -28,11 +31,16 @@ exports.getBusinesses = function(point, callback) {
     function(err, result) {
 
       if (err) {
-        callback(err, null); return;
+        logger.error("Error in yelp.getBusinesses()");
+        logger.error(err);
+        callback(err, null);
+        return;
       }
 
-      console.log(result);
-      
+      if (result.businesses.length === 0) {
+        logger.warn("Yelp API call returned a list of businesses of zero length.");
+      }
+
       // Extract the exact information we need for each result
       var items = [];
       result.businesses.forEach(function(item) {

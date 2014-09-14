@@ -1,15 +1,16 @@
 
 var collection = require("mongoskin").db(process.env.MONGOLAB_URI || "mongodb://localhost:27017/meadle").collection("users");
+var logger = require("log4js").getLogger();
 
 exports.getUser = function(userId, callback) {
 
   collection.findOne({"userId": userId}, function(err, result) {
 
     if (err) {
-      console.log("Error while reading user " + userId + " from database");
+      logger.error("Error while reading user " + userId + " from database");
+      callback(err, null); return;
     } else {
-      console.log("User get from database complete");
-      callback(err, result);
+      callback(err, result); return;
     }
 
   });
@@ -30,9 +31,7 @@ exports.createUser = function(userObject) {
   collection.insert(userObject, function(err, result) {
 
     if (err) {
-      console.log("Error creating user in mongo");
-    } else {
-      console.log("User creation successful");
+      logger.error("Error creating user in mongo");
     }
 
   });

@@ -1,5 +1,6 @@
 
 var async = require("async");
+var logger = require("log4js").getLogger();
 var mongoMeetings = require("./mongo_meetings");
 var mongoUsers = require("./mongo_users");
 
@@ -7,12 +8,14 @@ var mongoUsers = require("./mongo_users");
  *  in that meetings Mongo document. It also returns that value through the callback
  *  passed in for immediate usage if desired. */
 exports.calcAndStoreMidpoint = function(meetingId, mCallback) {
+  logger.trace("geo.calcAndStoreMidpoint() : Calculating and storing midpoint for " + meetingId);
 
   // Query for the meeting object
   mongoMeetings.getMeeting(meetingId, function(err, result) {
 
     if (err) {
-      console.log("Error while querying for meeting during midpoint calculation"); return;
+      logger.error("Error getting meeting " + meetingId + " from mongo during midpoint calculation");
+      mCallback(err, null); return;
     }
 
     async.map(result.members, function(member, callback) {
