@@ -1,5 +1,5 @@
 
-See the wiki for detailed information on the format of our api.
+[ ![Codeship Status for mhoc/meadle-backend](https://codeship.io/projects/f085b1d0-1e04-0132-d672-1642395b3d51/status)](https://codeship.io/projects/35479)
 
 Pre-Reqs
 ========
