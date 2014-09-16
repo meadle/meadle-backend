@@ -1,15 +1,10 @@
 
-var logger = require("log4js").getLogger();
-var yelp = require('../util/yelp');
-var should = require('should');
-var app = require('../server').app;
+var app = require('../server');
 var request = require('supertest')
-var port = 3000;
 
 describe('POST /meeting', function() {
-	it('POST /meeting should respond with a meeting ID', postMeetingTest)
+	it('should respond with a meeting ID', postMeetingTest)
 });
-
 
 function postMeetingTest() {
 	request(app)
@@ -17,6 +12,13 @@ function postMeetingTest() {
     .send({ 'userId':'1234','lat':100.65,'lng':60.75,'datetime':'2014-09-16' })
     .set('Accept', 'application/json')
     .expect('Content-Type', /json/)
-    .expect('meetingId')
-    .expect(201);
+    .expect(containsMeetingIdField)
+    .expect(201)
+		.end(function(err, result) {
+			if (err) { throw err; }
+		});
+}
+
+function containsMeetingIdField(res) {
+	if (!('meetingId' in res.body)) return "missing the meetingId key";
 }

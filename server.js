@@ -23,10 +23,6 @@ app.put("/meeting/:meetingId/join", meetingRoute.joinMeeting);
 // Set up mongo db
 mongo.init();
 
-// Initiate pre-run tests
-// I just use this function to expedite testing of code I write so i dont have to modify server.js
-//tests.run();
-
 // Get port
 // Heroku sets the port of the app as an environment variable, but if you run locally it will
 // default to 3000
@@ -37,4 +33,5 @@ var server = app.listen(port, function() {
 	logger.info("Listening on port " + server.address().port);
 });
 
+// Export the express application for use in test cases
 module.exports = app;
