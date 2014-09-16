@@ -3,15 +3,17 @@
 var express = require('express');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
-//var tests = require('./test/tests');
-
-// Routes
-var meetingRoute = require('./routes/meeting');
 var mongo = require('./util/mongo_init');
+var meetingRoute = require('./routes/meeting');
 
 // Express
 var app = express();
 app.use(express.json());
+
+// Simple 200 return on route to / for codeship's ping to heroku on deploy
+app.get("/", function(req, res) {
+	res.status(200).send("A-OK");
+});
 
 // Defining routes
 app.get("/meeting/:meetingId", meetingRoute.getMeeting);
