@@ -16,5 +16,6 @@
     "yelp": "*",
 	"q": "*",
 	"chai-as-promised": "*"
+	"request": "*",
   }
 }
