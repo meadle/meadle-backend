@@ -3,7 +3,7 @@ var request = require('request');
 
 module.exports = function(gcmKey) {
 	return {
-		sendNotification = function(registrationIds, data, dry_run) {
+		sendNotification: function(registrationIds, data, dry_run) {
 			// This probably doesn't need to be an async function because 
 			// I have observed GCM responding to requests in under a second historically.
 
