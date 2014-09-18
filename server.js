@@ -21,7 +21,15 @@ app.post("/meeting", meetingRoute.postMeeting);
 app.put("/meeting/:meetingId/join", meetingRoute.joinMeeting);
 
 // Set up mongo db
-mongo.init();
+mongo.init(function(err, results) {
+
+	// If there is an error creating the collections, kill the server
+	if (err) {
+		logger.fatal("Exiting server");
+		process.exit(1);
+	}
+
+});
 
 // Get port
 // Heroku sets the port of the app as an environment variable, but if you run locally it will
