@@ -5,6 +5,7 @@ var log4js = require('log4js');
 var logger = log4js.getLogger();
 var mongo = require('./util/mongo_init');
 var meetingRoute = require('./routes/meeting');
+var gcm = require('./util/gcm')('AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo');
 
 // Express
 var app = express();

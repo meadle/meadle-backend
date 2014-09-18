@@ -10,6 +10,7 @@
     "mongoskin": "*",
     "should": "^4.0.4",
     "supertest": "^0.13.0",
-    "yelp": "*"
+    "yelp": "*",
+	"request": "*",
   }
 }
