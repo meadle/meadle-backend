@@ -10,7 +10,6 @@ describe('API Tests POST',function(){
         should(res.status).eql(201)
         should(res.body).have.property('meetingId')
         should(res.body.meetingId).be.a.String
-        should(res.body.meetingId.length).eql(13)
         done()
       })
     })
@@ -33,7 +32,6 @@ describe('API TESTS GET',function(){
           should(res.body).have.property("meetingId")
           should(res.body).have.property("datetime")
           should(res.body.meetingId).be.a.String
-          should(res.body.meetingId.length).eql(13)
           should(res.body.datetime).be.a.String
 
           done()
