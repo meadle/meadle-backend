@@ -3,13 +3,15 @@
   "version": "0.0.1",
   "dependencies": {
     "async": "*",
+    "expect": "^0.1.1",
     "express": "3.3.x",
     "log4js": "^0.6.21",
     "mocha": "^1.21.4",
     "mongodb": "*",
     "mongoskin": "*",
+    "nock": "^0.47.0",
     "should": "^4.0.4",
-    "supertest": "^0.13.0",
+    "superagent": "^0.18.2",
     "yelp": "*"
   }
 }
