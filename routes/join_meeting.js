@@ -8,31 +8,32 @@ var yelp = require("../util/yelp")
 module.exports = function(req, res) {
 
   // Extract from post data
-  var meetingId = req.param("meetingId");
-  var me = req.body.userId;
-  var lat = req.body.lat;
-  var lng = req.body.lng;
+  var meetingId = req.param("meetingId")
+  var me = req.body.userId
+  var lat = req.body.lat
+  var lng = req.body.lng
 
-  if (!meetingId || !me || !lat || !lng) {
-    logger.warn("Client supplied illformatted PUT body. Sending 400");
-    res.status(400).send({"error":400, "message":"PUT body was not formatted correctly."}); return;
+  if (!validatePutData(res, me, lat, lng, meetingId) {
+    return
   }
 
   // Create the user in mongo
-  mongoUsers.createUser({"userId": me, "lat": lat, "lng": lng});
+  mongoUsers.createUser({"userId": me, "lat": lat, "lng": lng})
 
   // Get the meeting in question
   mongoMeetings.getMeeting(meetingId, function(err, result) {
 
       if (err) {
-        logger.error("Mongo threw an error during getMeeting on PUT new meeting member");
-        logger.error(err);
-        res.status(500).send({"error": 500, "message": "An internal error occured (1)."}); return;
+        logger.error("Mongo threw an error during getMeeting on PUT new meeting member")
+        logger.error(err)
+        res.status(500).send({"error": 500, "message": "An internal error occured (1)."})
+        return
       }
 
       if (result.members.length >= 2) {
-        logger.warn("User " + me + " tried to join a meeting that already has 2 members.");
-        res.status(403).send({"error": 403, "message": "Meetings can only have two participants."}); return;
+        logger.warn("User " + me + " tried to join a meeting that already has 2 members.")
+        res.status(403).send({"error": 403, "message": "Meetings can only have two participants."})
+        return
       }
 
       // Add the member to the meeting
@@ -42,20 +43,20 @@ module.exports = function(req, res) {
         geo.calcAndStoreMidpoint(meetingId, function(err, result) {
 
           if (err) {
-            logger.error("An error was thrown during midpoint calculation");
-            logger.error(err);
-            res.status(500).send({"error": 500, "message": "An internal error occured (2)"});
-            return;
+            logger.error("An error was thrown during midpoint calculation")
+            logger.error(err)
+            res.status(500).send({"error": 500, "message": "An internal error occured (2)"})
+            return
           }
 
           // Query yelp for the businesses
           yelp.getBusinesses(result, function(err, results) {
 
             if (err) {
-              logger.error("An error was thrown during the yelp API call");
-              logger.error(err);
-              res.status(500).send({"error":500, "message": "An internal error occured (3)"});
-              return;
+              logger.error("An error was thrown during the yelp API call")
+              logger.error(err)
+              res.status(500).send({"error":500, "message": "An internal error occured (3)"})
+              return
             }
 
             // Results should be a list of business IDs. Store them in mongo.
@@ -71,6 +72,15 @@ module.exports = function(req, res) {
 
   });
 
-  res.status(202).send("Accepted");
+  res.status(202).send("Accepted")
 
+}
+
+var validatePutData = function(res, me, lat, lng, meetingId) {
+  if (!me || !lat || !lng || !meetingId) {
+    logger.warn("Client supplied an illformatted PUT body. Sending 400.")
+    res.status(400).send({"error":400, "message": "PUT body was not formatted correctly."})
+    return false
+  }
+  return true
 }
