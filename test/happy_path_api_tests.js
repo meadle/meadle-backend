@@ -30,7 +30,7 @@ describe('Meeting Endpoints (Happy Path)', function() {
   var test_user2_id = "56578"
   var test_meeting_id = "-1"
 
-  it('post /meeting happy path', function(done) {
+  it('post /meeting', function(done) {
 
     superagent.post(BASE_URL + "meeting")
       .send({'userId': test_user_id, 'lat': 100.65, 'lng':60.75, 'datetime':'2014-09-16'})
@@ -46,7 +46,7 @@ describe('Meeting Endpoints (Happy Path)', function() {
 
   })
 
-  it('get /meeting/{id} happy path first user', function(done) {
+  it('get /meeting/{id} first user', function(done) {
 
     superagent.get(BASE_URL + 'meeting/' + test_meeting_id + "?userId=" + test_user_id)
       .end(function(err, res) {
@@ -62,7 +62,7 @@ describe('Meeting Endpoints (Happy Path)', function() {
 
   })
 
-  it('put /meeting/{id}/join happy path', function(done) {
+  it('put /meeting/{id}/join', function(done) {
 
     superagent.put(BASE_URL + "meeting/" + test_meeting_id + "/join")
       .send({ 'userId': test_user2_id, 'lat': 114.1, 'lng': -85.2 })
@@ -75,7 +75,7 @@ describe('Meeting Endpoints (Happy Path)', function() {
 
   })
 
-  it('get /meeting/{} happy path second user', function(done) {
+  it('get /meeting/{id} second user', function(done) {
 
     superagent.get(BASE_URL + 'meeting/' + test_meeting_id + "?userId=" + test_user2_id)
       .end(function(err, res) {
