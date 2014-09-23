@@ -17,7 +17,7 @@ app.get("/", function(req, res) {
 
 // Defining routes
 app.get("/meeting/:meetingId", require("./routes/get_meeting"));
-app.post("/meeting", meetingRoute.postMeeting);
+app.post("/meeting", require("./routes/create_meeting"));
 app.put("/meeting/:meetingId/join", meetingRoute.joinMeeting);
 
 // Set up mongo db
