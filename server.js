@@ -13,6 +13,7 @@ app.get("/", require("./routes/root"))
 app.get("/meeting/:meetingId", require("./routes/get_meeting"))
 app.post("/meeting", require("./routes/create_meeting"))
 app.put("/meeting/:meetingId/join", require("./routes/join_meeting"))
+app.put("/meeting/:meetingId/vote", require("./routes/vote_meeting"))
 
 // Set up mongo db
 mongo.init(function(err, results) {
