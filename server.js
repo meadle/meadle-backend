@@ -1,8 +1,7 @@
 
 // Imports
 var express = require('express');
-var log4js = require('log4js');
-var logger = log4js.getLogger();
+var logger = require('log4js').getLogger();
 var mongo = require('./util/mongo_init');
 var meetingRoute = require('./routes/meeting');
 var gcm = require('./util/gcm')('AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo');
@@ -11,15 +10,11 @@ var gcm = require('./util/gcm')('AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo');
 var app = express();
 app.use(express.json());
 
-// Simple 200 return on route to / for codeship's ping to heroku on deploy
-app.get("/", function(req, res) {
-	res.status(200).send("A-OK");
-});
-
 // Defining routes
-app.get("/meeting/:meetingId", require("./routes/get_meeting"));
-app.post("/meeting", require("./routes/create_meeting"));
-app.put("/meeting/:meetingId/join", require("./routes/join_meeting"));
+app.get("/", require("./routes/root"))
+app.get("/meeting/:meetingId", require("./routes/get_meeting"))
+app.post("/meeting", require("./routes/create_meeting"))
+app.put("/meeting/:meetingId/join", require("./routes/join_meeting"))
 
 // Set up mongo db
 mongo.init(function(err, results) {
