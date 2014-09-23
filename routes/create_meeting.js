@@ -6,43 +6,49 @@ var mongoUsers = require("../util/mongo_users")
 module.exports = function(req, res) {
 
   // Extract data from the post data
-  var me = req.body.userId;
-  var lat = req.body.lat;
-  var lng = req.body.lng;
-  var datetime = req.body.datetime;
+  var me = req.body.userId
+  var lat = req.body.lat
+  var lng = req.body.lng
+  var datetime = req.body.datetime
 
   if (!validatePostData(res, me, lat, lng, datetime)) {
-    return;
+    return
   }
 
   // Generate a random meeting id
-  var mid = Math.random().toString(36).substring(5);
+  var mid = Math.random().toString(36).substring(5)
 
   // Create the user in mongo
-  mongoUsers.createUser({"userId": me, "lat": lat, "lng": lng});
+  mongoUsers.createUser({"userId": me, "lat": lat, "lng": lng})
 
   // Create the meeting
   var meeting = {"meetingId": mid, "datetime": datetime, "members": [me]}
-  mongoMeetings.createMeeting(meeting, onMongoMeetingCreated);
-
-  // Pass back a 201 that the meeting was succesfully created
-  var returnObj = {"meetingId": mid}
-  res.status(201).send(returnObj);
+  mongoMeetings.createMeeting(meeting, onMongoMeetingCreated(res, mid))
 
 }
 
 var validatePostData = function(res, me, lat, lng, datetime) {
   if (!me || !lat || !lng || !datetime) {
-    logger.warn("Client supplied an illformatted POST body. Sending 400.");
-    res.status(400).send({"error":400, "message": "POST body was not formatted correctly."});
-    return false;
+    logger.warn("Client supplied an illformatted POST body. Sending 400.")
+    res.status(400).send({"error":400, "message": "POST body was not formatted correctly."})
+    return false
   }
-  return true;
+  return true
 }
 
-var onMongoMeetingCreated = function(err, result) {
+var onMongoMeetingCreated = function(response, meetingId) {
 
-  // Right now nothing is done here
-  // An error will already be logged in the mongo call if err != nil so this just does nothing for now
+  return function(err, result) {
+
+    if (err) {
+      logger.error("Mongo threw an error while creating a meeting. Sending 500 to client.")
+      response.status(500).send({"error":500, "message": "Internal server error."})
+      return
+    }
+
+    var returnObj = {"meetingId": meetingId}
+    response.status(201).send(returnObj)
+
+  }
 
 }
