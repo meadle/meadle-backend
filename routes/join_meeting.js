@@ -143,8 +143,14 @@ var onGetYelpBusinesses = function(response, meetingId, userId) {
       }
     }
 
-    // Results should be a list of business IDs. Store them in mongo.
-    mongoMeetings.setTopLocations(meetingId, results, onTopLocationsSet(response, meetingId, userId))
+    // Results should be a list of business IDs.
+    // Create an object such that each id is a key in the object, then store that object in mongo
+    // The value for the key (business id) is the number of votes that business currently has (0)
+    var finalObject = {}
+    results.forEach(function(item)) {
+      finalObject.item = 0
+    }
+    mongoMeetings.setTopLocations(meetingId, finalObjects, onTopLocationsSet(response, meetingId, userId))
 
   }
 
