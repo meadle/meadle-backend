@@ -34,6 +34,3 @@ var port = process.env.PORT || 3000;
 var server = app.listen(port, function() {
 	logger.info("Listening on port " + server.address().port);
 });
-
-// Export the express application for use in test cases
-module.exports = app;
