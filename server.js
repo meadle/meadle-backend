@@ -17,7 +17,7 @@ app.get("/", function(req, res) {
 });
 
 // Defining routes
-app.get("/meeting/:meetingId", meetingRoute.getMeeting);
+app.get("/meeting/:meetingId", require("./routes/get_meeting"));
 app.post("/meeting", meetingRoute.postMeeting);
 app.put("/meeting/:meetingId/join", meetingRoute.joinMeeting);
 
