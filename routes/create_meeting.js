@@ -11,9 +11,8 @@ module.exports = function(req, res) {
   var lng = req.body.lng;
   var datetime = req.body.datetime;
 
-  if (!me || !lat || !lng || !datetime) {
-    logger.warn("Client supplied an illformatted POST body. Sending 400.");
-    res.status(400).send({"error":400, "message": "POST body was not formatted correctly."}); return;
+  if (!validatePostData(res, me, lat, lng, datetime)) {
+    return;
   }
 
   // Generate a random meeting id
@@ -23,16 +22,27 @@ module.exports = function(req, res) {
   mongoUsers.createUser({"userId": me, "lat": lat, "lng": lng});
 
   // Create the meeting
-  mongoMeetings.createMeeting({"meetingId": mid, "datetime": datetime, "members": [me]}, function(err, result) {
+  var meeting = {"meetingId": mid, "datetime": datetime, "members": [me]}
+  mongoMeetings.createMeeting(meeting, onMongoMeetingCreated);
 
-    if (err) {
-      logger.error("Error while inserting meeting into mongo. Returning 500.")
-      res.status(500).send({"error":500, "message":"Internal server error"}); return;
-    }
+  // Pass back a 201 that the meeting was succesfully created
+  var returnObj = {"meetingId": mid}
+  res.status(201).send(returnObj);
 
-    // Pass back the meeting id to the client
-    res.status(201).send({"meetingId": mid});
+}
 
-  });
+var validatePostData = function(res, me, lat, lng, datetime) {
+  if (!me || !lat || !lng || !datetime) {
+    logger.warn("Client supplied an illformatted POST body. Sending 400.");
+    res.status(400).send({"error":400, "message": "POST body was not formatted correctly."});
+    return false;
+  }
+  return true;
+}
+
+var onMongoMeetingCreated = function(err, result) {
+
+  // Right now nothing is done here
+  // An error will already be logged in the mongo call if err != nil so this just does nothing for now
 
 }
