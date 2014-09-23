@@ -92,8 +92,3 @@ describe('Meeting Endpoints (Happy Path)', function() {
   })
 
 })
-
-describe('Meeting Endpoints (Error Codes)', function(done) {
-
-
-})
