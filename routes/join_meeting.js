@@ -13,12 +13,14 @@ module.exports = function(req, res) {
   var lat = req.body.lat
   var lng = req.body.lng
 
-  if (!validatePutData(res, me, lat, lng, meetingId) {
+  if (!validatePutData(res, me, lat, lng, meetingId)) {
     return
   }
 
   // Create the user in mongo
-  mongoUsers.createUser({"userId": me, "lat": lat, "lng": lng})
+  mongoUsers.createUser({"userId": me, "lat": lat, "lng": lng}, function(err, result) {
+
+  })
 
   // Get the meeting in question
   mongoMeetings.getMeeting(meetingId, function(err, result) {
