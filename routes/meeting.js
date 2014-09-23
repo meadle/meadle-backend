@@ -68,10 +68,17 @@ exports.postMeeting = function(req, res) {
 	mongoUsers.createUser({"userId": me, "lat": lat, "lng": lng});
 
 	// Create the meeting
-	mongoMeetings.createMeeting({"meetingId": mid, "datetime": datetime, "members": [me]});
+	mongoMeetings.createMeeting({"meetingId": mid, "datetime": datetime, "members": [me]}, function(err, result) {
 
-	// Pass back the meeting id to the client
-	res.status(201).send({"meetingId": mid});
+		if (err) {
+			logger.error("Error while inserting meeting into mongo. Returning 500.")
+			res.status(500).send({"error":500, "message":"Internal server error"}); return;
+		}
+
+		// Pass back the meeting id to the client
+		res.status(201).send({"meetingId": mid});
+
+	});
 
 }
 
@@ -106,30 +113,34 @@ exports.joinMeeting = function(req, res) {
 			}
 
 			// Add the member to the meeting
-			mongoMeetings.addMember(me, meetingId);
+			mongoMeetings.addMember(meetingId, me, function(err, result) {
 
-			// Calculate and store the midpoint in mongo
-			geo.calcAndStoreMidpoint(meetingId, function(err, result) {
-
-				if (err) {
-					logger.error("An error was thrown during midpoint calculation");
-					logger.error(err);
-					res.status(500).send({"error": 500, "message": "An internal error occured (2)"});
-					return;
-				}
-
-				// Query yelp for the businesses
-				yelp.getBusinesses(result, function(err, results) {
+				// Calculate and store the midpoint in mongo
+				geo.calcAndStoreMidpoint(meetingId, function(err, result) {
 
 					if (err) {
-						logger.error("An error was thrown during the yelp API call");
+						logger.error("An error was thrown during midpoint calculation");
 						logger.error(err);
-						res.status(500).send({"error":500, "message": "An internal error occured (3)"});
+						res.status(500).send({"error": 500, "message": "An internal error occured (2)"});
 						return;
 					}
 
-					// Results should be a list of business IDs. Store them in mongo.
-					mongoMeetings.setTopLocations(meetingId, results);
+					// Query yelp for the businesses
+					yelp.getBusinesses(result, function(err, results) {
+
+						if (err) {
+							logger.error("An error was thrown during the yelp API call");
+							logger.error(err);
+							res.status(500).send({"error":500, "message": "An internal error occured (3)"});
+							return;
+						}
+
+						// Results should be a list of business IDs. Store them in mongo.
+						mongoMeetings.setTopLocations(meetingId, results, function(err, result) {
+							
+						});
+
+					});
 
 				});
 
