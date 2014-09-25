@@ -26,13 +26,28 @@ exports.createUser = function(userObject, callback) {
 
   // TODO: Add validation
 
-  collection.insert(userObject, function(err, result) {
+  exports.getUser(userObject.userId, function(err, result) {
 
     if (err) {
-      logger.error("Error creating user in mongo");
+      logger.error("Error while creating user")
     }
-    callback(err, result)
 
-  });
+    if (result) {
+      logger.warn("Attempting to add user which already exists in mongo. Returning userobj that already exists.")
+      callback(err, result)
+      return
+    }
+
+    // Actually create the user
+    collection.insert(userObject, function(err, result) {
+
+      if (err) {
+        logger.error("Error creating user in mongo");
+      }
+      callback(err, result)
+
+    });
+
+  })
 
 }

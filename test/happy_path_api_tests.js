@@ -33,7 +33,7 @@ describe('Meeting Endpoints (Happy Path)', function() {
   it('post /meeting', function(done) {
 
     superagent.post(BASE_URL + "meeting")
-      .send({'userId': test_user_id, 'lat': 100.65, 'lng':60.75, 'datetime':'2014-09-16'})
+      .send({'userId': test_user_id, 'gcm': 's0d9jf0s9djfs9d', 'lat': 100.65, 'lng':60.75, 'datetime':'2014-09-16'})
       .end(function(err, res) {
 
         should(res.status).eql(201)
@@ -65,7 +65,7 @@ describe('Meeting Endpoints (Happy Path)', function() {
   it('put /meeting/{id}/join', function(done) {
 
     superagent.put(BASE_URL + "meeting/" + test_meeting_id + "/join")
-      .send({ 'userId': test_user2_id, 'lat': 114.1, 'lng': -85.2 })
+      .send({ 'userId': test_user2_id, 'gcm': '2139jfd9fj', 'lat': 114.1, 'lng': -85.2 })
       .end(function(err, res) {
 
         should(res.status).eql(202)

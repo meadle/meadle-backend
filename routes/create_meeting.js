@@ -8,11 +8,12 @@ module.exports = function(req, res) {
 
   // Extract data from the post data
   var me = req.body.userId
+  var gcm = req.body.gcm
   var lat = req.body.lat
   var lng = req.body.lng
   var datetime = req.body.datetime
 
-  if (!validatePostData(res, me, lat, lng, datetime)) {
+  if (!validatePostData(res, me, gcm, lat, lng, datetime)) {
     return
   }
 
@@ -20,13 +21,13 @@ module.exports = function(req, res) {
   var mid = Math.random().toString(36).substring(5)
 
   // Create the user in mogno
-  var user = {"userId": me, "lat": lat, "lng": lng}
+  var user = {"userId": me, "gcm": gcm, "lat": lat, "lng": lng}
   mongoUsers.createUser(user, onMongoUserCreated(res, mid, datetime, me))
 
 }
 
-var validatePostData = function(res, me, lat, lng, datetime) {
-  if (!me || !lat || !lng || !datetime) {
+var validatePostData = function(res, me, gcm, lat, lng, datetime) {
+  if (!me || !lat || !gcm || !lng || !datetime) {
     logger.warn("Client supplied an illformatted POST body. Sending 400.")
     res.status(400).send({"error":400, "message": "POST body was not formatted correctly."})
     return false
