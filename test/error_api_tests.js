@@ -11,7 +11,7 @@ describe('Meeting Endpoints (Error Codes)', function() {
   it('post /meeting with incorrectly named properties', function(done) {
 
     superagent.post(BASE_URL + 'meeting')
-      .send( { "my_user_id": "1234555", 'latitude': -78.2, 'longitude': 42.3, 'date': "13245" } )
+      .send( { "my_user_id": "1234555", "gcm": "2f90jr2093jf0923jf", 'latitude': -78.2, 'longitude': 42.3, 'date': "13245" } )
       .end(function(err, res) {
 
         should(res.status).eql(400)
@@ -49,7 +49,7 @@ describe('Meeting Endpoints (Error Codes)', function() {
   it('get /meeting/{id} with unauthorized user', function(done) {
 
     superagent.post(BASE_URL + 'meeting/')
-      .send( { 'userId': '123', 'lat': 2.2, 'lng': 4.2, 'datetime': "12-23-2014" } )
+      .send( { 'userId': '123', 'gcm': '293fj2093fj0923jf903', 'lat': 2.2, 'lng': 4.2, 'datetime': "12-23-2014" } )
       .end(function(err, res) {
 
         var meetingId = res.body.meetingId
@@ -72,14 +72,14 @@ describe('Meeting Endpoints (Error Codes)', function() {
     var meetingId = "-1"
 
     superagent.post(BASE_URL + 'meeting/')
-      .send( { 'userId': uid1, 'lat': 2.2, 'lng': 4.1, 'datetime': "10230248" } )
+      .send( { 'userId': uid1, 'gcm':'92jf0293jf9', 'lat': 2.2, 'lng': 4.1, 'datetime': "10230248" } )
       .end(function(err, res) {
 
         should(res.status).eql(201)
         meetingId = res.body.meetingId
 
         superagent.put(BASE_URL + 'meeting/' + meetingId + '/join')
-          .send( { 'userId': uid2, 'latitude': 55.2, 'longitude': 98.21, "datetime": "92304834" } )
+          .send( { 'userId': uid2, 'gcm': '9dfjs09djfsd', 'latitude': 55.2, 'longitude': 98.21, "datetime": "92304834" } )
           .end(function(mErr, mRes) {
 
             should(mRes.status).eql(400)
@@ -98,7 +98,7 @@ describe('Meeting Endpoints (Error Codes)', function() {
     var meetingId = "-1"
 
     superagent.post(BASE_URL + 'meeting/')
-      .send( { 'userId': uid1, 'lat': 2.2, 'lng': 4.1, 'datetime': "10230248" } )
+      .send( { 'userId': uid1, 'gcm': 'asd9fjs90jdf', 'lat': 2.2, 'lng': 4.1, 'datetime': "10230248" } )
       .end(function(err, res) {
 
         should(res.status).eql(201)
