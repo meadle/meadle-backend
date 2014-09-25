@@ -5,19 +5,25 @@ if [ "$EUID" -ne 0 ]
 fi
 
 # Start mongod 
-mongod & > /dev/null 
-sleep 3
+echo "Starting mongod server..."
+mongod > /dev/null & 
+sleep 2
 
 # Install deps
-npm install
+echo "Installing node dependencies..."
+npm install > /dev/null
+npm install -g mocha > /dev/null
 
 # Start server
-node server.js & > /dev/null
-sleep 4
+echo "Starting server..."
+node server.js > /dev/null &
+sleep 3
 
 # Run tests
+echo "Running mocha tests..."
 mocha
 
 # Kill mongo and the server
+echo "Killing node and mongo."
 killall node
 killall mongod
