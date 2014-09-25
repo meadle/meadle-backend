@@ -15,7 +15,7 @@
     "supertest": "^0.13.0",
     "yelp": "*",
 	"q": "*",
-	"chai-as-promised": "*"
-	"request": "*",
+	"chai-as-promised": "*",
+	"request": "*"
   }
 }
