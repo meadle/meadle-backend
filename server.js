@@ -1,8 +1,11 @@
 
 // Imports
 var express = require('express');
-var logger = require('log4js').getLogger();
 var mongo = require('./util/mongo_init');
+var logger = require('log4js').getLogger();
+
+// Setup logger
+require('./logging/log4js_setup')()
 
 // Express
 var app = express();
