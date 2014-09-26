@@ -4,14 +4,15 @@ var db = require("mongoskin").db(process.env.MONGOLAB_URI || "mongodb://localhos
 var logger = require("log4js").getLogger();
 
 exports.init = function(callback) {
-  logger.trace("mongo.init() : Initializing mongo database collections.");
+  logger.trace("mongo.init() : Initializing mongo database collections");
 
   async.parallel( [ initUsers, initMeetings ],
 
     function(err, results) {
 
       if (err) {
-        logger.fatal("Error during mongo initialization.");
+        logger.fatal("Error during mongo initialization");
+        logger.fatal(err)
       }
       callback(err, results);
 
@@ -22,6 +23,7 @@ exports.init = function(callback) {
 }
 
 var initUsers = function(callback) {
+  logger.trace("mongo.initUsers() : Initializing mongo users collection")
 
   db.createCollection("users", function(err, collection) {
 
@@ -35,6 +37,7 @@ var initUsers = function(callback) {
 }
 
 var initMeetings = function(callback) {
+  logger.trace("mongo.initMeetings() : Initializing mongo meetings collection")
 
   db.createCollection("meetings", function(err, collection) {
 

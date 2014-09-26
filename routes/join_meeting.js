@@ -49,7 +49,7 @@ var onUserCreated = function(response, meetingId, userId) {
   return function(err, result) {
 
     if (err) {
-      logger.warn("Creating a user during join meeting failed in mongo. Sending 500")
+      logger.error("Creating a user during join meeting failed in mongo. Sending 500")
       response.status(500).send(errbldr.build500())
       return
     }
@@ -66,7 +66,7 @@ var onGetMeeting = function(response, meetingId, userId) {
   return function(err, result) {
 
     if (err) {
-      logger.warn("Error getting meeting to update during user join. Sending 500.")
+      logger.error("Error getting meeting to update during user join. Sending 500.")
       response.status(500).send(errbldr.build500())
       return
     }
@@ -95,7 +95,7 @@ var onMemberAdded = function(response, meetingId, userId) {
   return function(err, result) {
 
     if (err) {
-      logger.warn("Error adding member to meeting in mongo. Sending 500.")
+      logger.error("Error adding member to meeting in mongo. Sending 500.")
       response.status(500).send(errbldr.build500())
       return
     }
@@ -113,7 +113,7 @@ var onMidpointStored = function(response, meetingId, userId) {
 
     if (err) {
       logger.error("An error was thrown during midpoint calculation")
-      res.status(500).send({"error": 500, "message": "An internal error occured (2)"})
+      res.status(500).send(errbldr.build500())
       return
     }
 
@@ -134,7 +134,7 @@ var onGetYelpBusinesses = function(response, meetingId, userId) {
         results = []
       } else {
         logger.error("An error was thrown during the yelp API call")
-        response.status(500).send({"error":500, "message": "An internal error occured (3)"})
+        response.status(500).send(errbldr.build500())
         return
       }
     }

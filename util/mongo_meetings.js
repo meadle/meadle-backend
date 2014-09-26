@@ -3,6 +3,7 @@ var collection = require("mongoskin").db(process.env.MONGOLAB_URI || "mongodb://
 var logger = require("log4js").getLogger();
 
 exports.getMeeting = function(meetingId, callback) {
+  logger.trace("mongo.getMeeting() : Retrieving meeting by id " + meetingId)
 
   collection.findOne({"meetingId": meetingId}, function(err, result) {
 
@@ -23,6 +24,7 @@ exports.getMeeting = function(meetingId, callback) {
  *  members: [ // the intial member // ]
  */
 exports.createMeeting = function(meeting, callback) {
+  logger.trace("mongo.createMeeting() : creating meeting with id " + meeting.meetingId)
 
   // TODO: Add validation
 
@@ -42,6 +44,7 @@ exports.createMeeting = function(meeting, callback) {
  * _id field that mongo adds so we can update it in the database.
  */
 exports.addMember = function(meetingId, userId, callback) {
+  logger.trace("mongo.addMember() : adding member " + userId + " to meeting " + meetingId)
 
   /** TODO Validations */
 
@@ -63,6 +66,7 @@ exports.addMember = function(meetingId, userId, callback) {
 }
 
 exports.setMidpoint = function(meetingId, latitude, longitude, callback) {
+  logger.trace("mongo.setMidpoint() : setting midpoint (" + latitude + ", " + longitude + ") on meeting " + meetingId)
 
   /** TODO Validations */
 
@@ -84,6 +88,8 @@ exports.setMidpoint = function(meetingId, latitude, longitude, callback) {
 }
 
 exports.setTopLocations = function(meetingId, locations, callback) {
+  logger.trace("mongo.setTopLocations() : setting list of top locations on meeting " + meetingId)
+  logger.trace("  " + locations)
 
   /** TODO Validations */
 
@@ -98,7 +104,27 @@ exports.setTopLocations = function(meetingId, locations, callback) {
         logger.error("Error setting top locations for " + meetingId + " in mongo.")
       }
       callback(err, result)
+    }
+  )
 
-  })
+}
+
+exports.setFinalLocation = function(meetingId, finalLocation, callback) {
+  logger.trace("mongo.setFinalLocation() : setting final location " + finalLocation + " for meeting " + meetingId)
+
+  collection.update({"meetingId": meetingId},
+    {
+      "$set": {
+        "finalLocation": finalLocation
+      }
+    }, function(err, result) {
+
+      if (err) {
+        logger.error("Error setting final location for " + meetingId + " in mongo")
+      }
+      callback(err, result)
+
+    }
+  )
 
 }
