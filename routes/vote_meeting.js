@@ -10,30 +10,23 @@ module.exports = function(req, res) {
   var userId = req.param("userId")
   var votes = req.body.ranked
 
-  if (!validatePutBody(res, meetingId, userId, votes)) {
+  if (!meetingId || !userId || !votes) {
+    logger.warn("Client supplied an illformatted PUT body. Sending 400.")
+    res.status(400).send({"error":400, "message": "PUT body was not formatted correctly."})
     return
   }
 
   // Get the meeting object the user requested
-  mongoMeetings.getMeeting(meetingId, onGetMeeting(res, meetingId, userId))
+  mongoMeetings.getMeeting(meetingId, onGetMeeting(res, meetingId, userId, votes))
 
 }
 
-var validatePutBody = function(res, meetingId, userId, votes) {
-  if (!meetingId || !userId || !votes) {
-    logger.warn("Client supplied an illformatted PUT body. Sending 400.")
-    res.status(400).send({"error":400, "message": "PUT body was not formatted correctly."})
-    return false
-  }
-  return true;
-}
-
-var onGetMeeting = function(res, meetingId, userId) {
+var onGetMeeting = function(res, meetingId, userId, votes) {
 
   return function(err, result) {
 
     if (err) {
-      logger.warn("Error getting meeting to update during user join. Sending 500.")
+      logger.warn("Error getting meeting to update during user vote. Sending 500.")
       response.status(500).send({"error": 500, "message": "Internal server error"})
       return
     }
@@ -45,6 +38,40 @@ var onGetMeeting = function(res, meetingId, userId) {
       res.status(401).send("Unauthorized")
       return
     }
+
+    // Get the top locations already voted on
+    var topLocations = result.topLocations
+
+    // Run through the entire list the user gave once to ensure it is accurate with what we're storing in mongo
+    keys(topLocations).forEach(function(yelpId) {
+      var index = votes.indexOf(yelpId)
+
+      if (index === -1) {
+        logger.warn("Client provided an incorrect list of yelp Ids")
+        logger.warn(yelpId + " exists in mongo but was not provided by the user")
+        res.status(400).send({'error': 400, 'message': 'Yelp Id list provided is incorrect'})
+        return
+      }
+    })
+
+    // Now run through it again for real
+    var position = 0
+    keys(topLocations).forEach(function(yelpId) {
+      var index = votes.indexOf(yelpId)
+      topLocations[yelpId] += (votes.length - (position++))
+    })
+
+    // Re-set this object in mongo
+    // I feel like this entire function is a huge race condition...
+    mongoMeetings.setTopLocations(meetingId, topLocations, function(err, result) {
+
+      if (err) {
+        loggeer.error("Error setting top locations for meetings in mongo")
+        res.status(500).send("internal thingy")
+        return
+      }
+
+    })
 
 
 
