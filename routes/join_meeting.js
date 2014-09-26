@@ -156,7 +156,7 @@ var onTopLocationsSet = function(response, meetingId, userId) {
   return function(err, result) {
 
 	  mongoMeetings.getMeeting(meetingId, function(err, result) {
-		  gcm.sendNotification(result.members, { message: 'Top Location Set' }, false).then(function(resp) {
+		  gcm.sendNotification(result.members, { message: 'User has joined' }, false).then(function(resp) {
 			  logger.info('GCM Response: ' + JSON.stringify(resp));
 		  });
 		  //TODO: Check if the promise returned by sendNotification was successful
