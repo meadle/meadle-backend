@@ -154,7 +154,7 @@ var onTopLocationsSet = function(response, meetingId, userId) {
 
   return function(err, result) {
 
-      response.status(202).send("A-OK")
+      response.status(202).send({"status": 202, "message": "Accepted"})
 
   }
 
