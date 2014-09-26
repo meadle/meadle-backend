@@ -2,7 +2,7 @@
 var logger = require("log4js").getLogger();
 
 exports.filter = function(yelpBusiness) {
-  logger.trace("yelpBusinessModel.filter() : Purging unnecessary data from yelp business " + yelpBusiness.id);
+  logger.trace("models/yelp_business.filter() : Purging unnecessary data from yelp business " + yelpBusiness.id);
 
   var newBusiness = {};
 

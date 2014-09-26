@@ -1,4 +1,5 @@
 
+var errbldr = require('../errors/builder')
 var geo = require("../util/geo")
 var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
@@ -23,6 +24,7 @@ var gcm = require('../util/gcm')('AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo');
  */
 
 module.exports = function(req, res) {
+  logger.info("PUT /meeting/{id}/join")
 
   // Extract from post data
   var meetingId = req.param("meetingId")
@@ -30,7 +32,9 @@ module.exports = function(req, res) {
   var lat = req.body.lat
   var lng = req.body.lng
 
-  if (!validatePutData(res, me, lat, lng, meetingId)) {
+  if (!meetingId || !me || !lat || !lng) {
+    logger.warn("Client supplied an illformatted PUT body. Sending 400.")
+    res.status(400).send(errbldr.build400("PUT body was not formatted correctly"))
     return
   }
 
@@ -40,22 +44,13 @@ module.exports = function(req, res) {
 
 }
 
-var validatePutData = function(res, me, lat, lng, meetingId) {
-  if (!me || !lat || !lng || !meetingId) {
-    logger.warn("Client supplied an illformatted PUT body. Sending 400.")
-    res.status(400).send({"error":400, "message": "PUT body was not formatted correctly."})
-    return false
-  }
-  return true
-}
-
 var onUserCreated = function(response, meetingId, userId) {
 
   return function(err, result) {
 
     if (err) {
       logger.warn("Creating a user during join meeting failed in mongo. Sending 500")
-      response.status(500).send({"error":500, "message": "Internal server error"})
+      response.status(500).send(errbldr.build500())
       return
     }
 
@@ -72,19 +67,19 @@ var onGetMeeting = function(response, meetingId, userId) {
 
     if (err) {
       logger.warn("Error getting meeting to update during user join. Sending 500.")
-      response.status(500).send({"error": 500, "message": "Internal server error"})
+      response.status(500).send(errbldr.build500())
       return
     }
 
     if (!result) {
       logger.warn("Requested meeting id does not exist in storage")
-      response.status(404).send({"error":404, "message": "No meeting by that id was found"})
+      response.status(404).send(errbldr.build404("No meeting by that id was found"))
       return
     }
 
     if (result.members.length >= 2) {
       logger.warn("User " + userId + " tried to join a meeting that already has 2 members.")
-      res.status(403).send({"error": 403, "message": "Meetings can only have two participants."})
+      response.status(403).send(errbldr.build403("Meetings can only have two participants."))
       return
     }
 
@@ -101,7 +96,7 @@ var onMemberAdded = function(response, meetingId, userId) {
 
     if (err) {
       logger.warn("Error adding member to meeting in mongo. Sending 500.")
-      response.status(500).send({"error":500, "message": "Internal server error"})
+      response.status(500).send(errbldr.build500())
       return
     }
 

@@ -7,7 +7,7 @@ var logger = require('log4js').getLogger();
 // Setup logger
 require('./logging/log4js_setup')()
 
-// Express
+// Setup express
 var app = express();
 app.use(express.json());
 
