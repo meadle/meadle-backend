@@ -44,7 +44,7 @@ exports.getBusinesses = function(point, callback) {
       // Extract the exact information we need for each result
       var items = [];
       result.businesses.forEach(function(item) {
-        items.push(yelpModel.filter(item));
+        items.push(yelpModel.filter(item).id);
       });
 
       // Return them

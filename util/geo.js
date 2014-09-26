@@ -27,7 +27,7 @@ exports.calcAndStoreMidpoint = function(meetingId, mCallback) {
     }, function(err, results) {
 
       var midpoint = exports.getMidpoint(results);
-      mongoMeetings.setMidpoint(midpoint.lat, midpoint.lng, meetingId, function(err, result) {
+      mongoMeetings.setMidpoint(meetingId, midpoint.lat, midpoint.lng, function(err, result) {
           mCallback(err, midpoint);
       });
 

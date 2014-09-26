@@ -1,9 +1,11 @@
 
+var errbldr = require('../errors/builder')
 var geo = require("../util/geo")
 var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
 var mongoUsers = require("../util/mongo_users")
 var yelp = require("../util/yelp")
+var gcm = require('../util/gcm')('AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo');
 
 /* READ THIS FIRST
  * SERIOUSLY
@@ -22,6 +24,7 @@ var yelp = require("../util/yelp")
  */
 
 module.exports = function(req, res) {
+  logger.info("PUT /meeting/{id}/join")
 
   // Extract from post data
   var meetingId = req.param("meetingId")
@@ -30,7 +33,9 @@ module.exports = function(req, res) {
   var lat = req.body.lat
   var lng = req.body.lng
 
-  if (!validatePutData(res, me, gcm, lat, lng, meetingId)) {
+  if (!meetingId || !me || !lat || !lng) {
+    logger.warn("Client supplied an illformatted PUT body. Sending 400.")
+    res.status(400).send(errbldr.build400("PUT body was not formatted correctly"))
     return
   }
 
@@ -40,22 +45,13 @@ module.exports = function(req, res) {
 
 }
 
-var validatePutData = function(res, me, gcm, lat, lng, meetingId) {
-  if (!me || !gcm || !lat || !lng || !meetingId) {
-    logger.warn("Client supplied an illformatted PUT body. Sending 400.")
-    res.status(400).send({"error":400, "message": "PUT body was not formatted correctly."})
-    return false
-  }
-  return true
-}
-
 var onUserCreated = function(response, meetingId, userId) {
 
   return function(err, result) {
 
     if (err) {
-      logger.warn("Creating a user during join meeting failed in mongo. Sending 500")
-      response.status(500).send({"error":500, "message": "Internal server error"})
+      logger.error("Creating a user during join meeting failed in mongo. Sending 500")
+      response.status(500).send(errbldr.build500())
       return
     }
 
@@ -71,20 +67,20 @@ var onGetMeeting = function(response, meetingId, userId) {
   return function(err, result) {
 
     if (err) {
-      logger.warn("Error getting meeting to update during user join. Sending 500.")
-      response.status(500).send({"error": 500, "message": "Internal server error"})
+      logger.error("Error getting meeting to update during user join. Sending 500.")
+      response.status(500).send(errbldr.build500())
       return
     }
 
     if (!result) {
       logger.warn("Requested meeting id does not exist in storage")
-      response.status(404).send({"error":404, "message": "No meeting by that id was found"})
+      response.status(404).send(errbldr.build404("No meeting by that id was found"))
       return
     }
 
     if (result.members.length >= 2) {
-      logger.warn("User " + me + " tried to join a meeting that already has 2 members.")
-      res.status(403).send({"error": 403, "message": "Meetings can only have two participants."})
+      logger.warn("User " + userId + " tried to join a meeting that already has 2 members.")
+      response.status(403).send(errbldr.build403("Meetings can only have two participants."))
       return
     }
 
@@ -100,8 +96,8 @@ var onMemberAdded = function(response, meetingId, userId) {
   return function(err, result) {
 
     if (err) {
-      logger.warn("Error adding member to meeting in mongo. Sending 500.")
-      response.status(500).send({"error":500, "message": "Internal server error"})
+      logger.error("Error adding member to meeting in mongo. Sending 500.")
+      response.status(500).send(errbldr.build500())
       return
     }
 
@@ -118,7 +114,7 @@ var onMidpointStored = function(response, meetingId, userId) {
 
     if (err) {
       logger.error("An error was thrown during midpoint calculation")
-      res.status(500).send({"error": 500, "message": "An internal error occured (2)"})
+      res.status(500).send(errbldr.build500())
       return
     }
 
@@ -139,7 +135,7 @@ var onGetYelpBusinesses = function(response, meetingId, userId) {
         results = []
       } else {
         logger.error("An error was thrown during the yelp API call")
-        response.status(500).send({"error":500, "message": "An internal error occured (3)"})
+        response.status(500).send(errbldr.build500())
         return
       }
     }
@@ -155,7 +151,14 @@ var onTopLocationsSet = function(response, meetingId, userId) {
 
   return function(err, result) {
 
-      response.status(202).send()
+	  mongoMeetings.getMeeting(meetingId, function(err, result) {
+		  gcm.sendNotification(result.members, { message: 'User has joined' }, false).then(function(resp) {
+			  logger.info('GCM Response: ' + JSON.stringify(resp));
+		  });
+		  //TODO: Check if the promise returned by sendNotification was successful
+	  });
+
+	  response.status(202).send({"status": 202, "message": "Accepted"});
 
   }
 
