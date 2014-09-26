@@ -3,7 +3,6 @@
 var express = require('express');
 var logger = require('log4js').getLogger();
 var mongo = require('./util/mongo_init');
-var gcm = require('./util/gcm')('AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo');
 
 // Express
 var app = express();

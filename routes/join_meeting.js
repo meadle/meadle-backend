@@ -4,6 +4,7 @@ var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
 var mongoUsers = require("../util/mongo_users")
 var yelp = require("../util/yelp")
+var gcm = require('../util/gcm')('AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo');
 
 /* READ THIS FIRST
  * SERIOUSLY
@@ -154,7 +155,11 @@ var onTopLocationsSet = function(response, meetingId, userId) {
 
   return function(err, result) {
 
-      response.status(202).send({"status": 202, "message": "Accepted"})
+	  // Send GCM push notification to user with GCM ID userId
+	  gcm.sendNotification([userId], { message: 'Top Location Set' }, false);
+	  //TODO: Check if the promise returned by sendNotification was successful
+
+	  response.status(202).send({"status": 202, "message": "Accepted"});
 
   }
 
