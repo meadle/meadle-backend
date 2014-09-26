@@ -1,10 +1,11 @@
 
-var async = require("async")
+var errbldr = require("../errors/builder")
 var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
 var mongoUsers = require("../util/mongo_users")
 
 module.exports = function(req, res) {
+  logger.info("POST /meeting")
 
   // Extract data from the post data
   var me = req.body.userId
@@ -13,26 +14,23 @@ module.exports = function(req, res) {
   var lng = req.body.lng
   var datetime = req.body.datetime
 
-  if (!validatePostData(res, me, gcm, lat, lng, datetime)) {
+  if (!me || !gcm || !lat || !lng || !datetime) {
+    logger.warn("Client supplied an illformatted POST body. Sending 400.")
+    res.status(400).send(errbldr.build400("POST body was not formatted correctly."))
     return
   }
 
   // Generate a random meeting id
-  var mid = Math.random().toString(36).substring(5)
+  var mida = []
+  for (i = 0; i < 9; i++) {
+    mida[i] = Math.floor(Math.random()*9)
+  }
+  var mid = mida.join("")
 
   // Create the user in mogno
   var user = {"userId": me, "gcm": gcm, "lat": lat, "lng": lng}
   mongoUsers.createUser(user, onMongoUserCreated(res, mid, datetime, me))
 
-}
-
-var validatePostData = function(res, me, gcm, lat, lng, datetime) {
-  if (!me || !lat || !gcm || !lng || !datetime) {
-    logger.warn("Client supplied an illformatted POST body. Sending 400.")
-    res.status(400).send({"error":400, "message": "POST body was not formatted correctly."})
-    return false
-  }
-  return true
 }
 
 var onMongoUserCreated = function(response, meetingId, datetime, userId) {
@@ -41,7 +39,7 @@ var onMongoUserCreated = function(response, meetingId, datetime, userId) {
 
     if (err) {
       logger.error("Mongo threw an error while creating a user during meeting creation. Sending 500 to client.")
-      response.status(500).send({"error": 500, "message": "Internal server error"})
+      response.status(500).send(errbldr.build500())
       return
     }
 
@@ -59,7 +57,7 @@ var onMongoMeetingCreated = function(response, meetingId) {
 
     if (err) {
       logger.error("Mongo threw an error while creating a meeting. Sending 500 to client.")
-      response.status(500).send({"error":500, "message": "Internal server error."})
+      response.status(500).send(errbldr.build500())
       return
     }
 

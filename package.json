@@ -16,6 +16,10 @@
     "nock": "^0.47.0",
     "should": "^4.0.4",
     "superagent": "^0.18.2",
-    "yelp": "*"
+    "supertest": "^0.13.0",
+    "yelp": "*",
+	"q": "*",
+	"chai-as-promised": "*",
+	"request": "*"
   }
 }

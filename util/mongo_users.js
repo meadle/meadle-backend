@@ -3,6 +3,7 @@ var collection = require("mongoskin").db(process.env.MONGOLAB_URI || "mongodb://
 var logger = require("log4js").getLogger()
 
 exports.getUser = function(userId, callback) {
+  logger.trace("mongo.getUser() : Getting user " + userId)
 
   collection.findOne({"userId": userId}, function(err, result) {
 
@@ -23,6 +24,7 @@ exports.getUser = function(userId, callback) {
  *  }
  */
 exports.createUser = function(userObject, callback) {
+  logger.trace("mongo.createUser() : Creating user " + userObject.userId)
 
   // TODO: Add validation
 

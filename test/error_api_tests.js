@@ -36,7 +36,7 @@ describe('Meeting Endpoints (Error Codes)', function() {
 
   it('get /meeting/{id} with nonexistent meetingId', function(done) {
 
-    superagent.get(BASE_URL + 'meeting/' + '203984572930475')
+    superagent.get(BASE_URL + 'meeting/' + '203984572930475?userId=390434')
       .end(function(err, res) {
 
         should(res.status).eql(404)

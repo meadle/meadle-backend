@@ -4,7 +4,7 @@ var logger = require("log4js").getLogger();
 /** Filters a user from the database by removing the fields that we don't want returned the client.
   * I'm not sure if this will ever be called but i'm including it. */
 exports.filter = function(user) {
-  logger.trace("userModel.filter() : Purging sensitive user data from user " + user.userId);
+  logger.trace("models/user.filter() : Purging sensitive user data from user " + user.userId);
 
   var nUser = {};
   nUser.userId = user.userId;
@@ -17,7 +17,7 @@ exports.filter = function(user) {
 
 /** Validates that a given object is of the type user object */
 exports.validate = function(user) {
-  logger.trace("userModel.validate() : Validating user has proper fields");
+  logger.trace("models/user.validate() : Validating user has proper fields");
 
   if (!user.userId) {
     return false;
