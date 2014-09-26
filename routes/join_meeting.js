@@ -83,7 +83,7 @@ var onGetMeeting = function(response, meetingId, userId) {
     }
 
     if (result.members.length >= 2) {
-      logger.warn("User " + me + " tried to join a meeting that already has 2 members.")
+      logger.warn("User " + userId + " tried to join a meeting that already has 2 members.")
       res.status(403).send({"error": 403, "message": "Meetings can only have two participants."})
       return
     }
