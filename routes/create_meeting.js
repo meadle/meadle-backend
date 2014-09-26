@@ -21,7 +21,11 @@ module.exports = function(req, res) {
   }
 
   // Generate a random meeting id
-  var mid = Math.random().toString(36).substring(5)
+  var mida = []
+  for (i = 0; i < 9; i++) {
+    mida[i] = Math.floor(Math.random()*9)
+  }
+  var mid = mida.join("")
 
   // Create the user in mogno
   var user = {"userId": me, "gcm": gcm, "lat": lat, "lng": lng}
