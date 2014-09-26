@@ -1,4 +1,5 @@
 
+var gcm = require("../util/gcm")
 var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
 var mongoUsers = require("../util/mongo_users")
@@ -71,9 +72,25 @@ var onGetMeeting = function(res, meetingId, userId, votes) {
         return
       }
 
+      // At this point we're going to assume there are only two users, this will be improved later
+      // Calculate the current winner
+      var max = -1
+      var top = ""
+      keys(topLocations).forEach(function(yelpId) {
+        if (topLocations[yelpId] > max) {
+          max = topLocations[yelpId]
+          top = yelpId
+        }
+      })
+
+      // Get list of all users
+      mongoMeetings.getGcmIds(meetingId, function(err, results) {
+        gcm.sendNotification(results, {'topLocation':top}, false).then(function(response) {
+          res.status(202).send()
+        })
+      })
+
     })
-
-
 
   }
 
