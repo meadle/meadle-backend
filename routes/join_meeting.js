@@ -29,10 +29,11 @@ module.exports = function(req, res) {
   // Extract from post data
   var meetingId = req.param("meetingId")
   var me = req.body.userId
+  var gcm = req.body.gcm
   var lat = req.body.lat
   var lng = req.body.lng
 
-  if (!meetingId || !me || !lat || !lng) {
+  if (!meetingId || !gcm || !me || !lat || !lng) {
     logger.warn("Client supplied an illformatted PUT body. Sending 400.")
     res.status(400).send(errbldr.build400("PUT body was not formatted correctly"))
     return

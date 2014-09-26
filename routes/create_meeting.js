@@ -14,7 +14,7 @@ module.exports = function(req, res) {
   var lng = req.body.lng
   var datetime = req.body.datetime
 
-  if (!me || !lat || !lng || !datetime) {
+  if (!me || !gcm || !lat || !lng || !datetime) {
     logger.warn("Client supplied an illformatted POST body. Sending 400.")
     res.status(400).send(errbldr.build400("POST body was not formatted correctly."))
     return
