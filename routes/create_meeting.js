@@ -1,5 +1,4 @@
 
-var async = require("async")
 var errbldr = require("../errors/builder")
 var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
@@ -10,6 +9,7 @@ module.exports = function(req, res) {
 
   // Extract data from the post data
   var me = req.body.userId
+  var gcm = req.body.gcm
   var lat = req.body.lat
   var lng = req.body.lng
   var datetime = req.body.datetime
@@ -24,7 +24,7 @@ module.exports = function(req, res) {
   var mid = Math.random().toString(36).substring(5)
 
   // Create the user in mogno
-  var user = {'userId': me, 'lat': lat, 'lng': lng}
+  var user = {"userId": me, "gcm": gcm, "lat": lat, "lng": lng}
   mongoUsers.createUser(user, onMongoUserCreated(res, mid, datetime, me))
 
 }

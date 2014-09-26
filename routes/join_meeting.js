@@ -151,12 +151,11 @@ var onTopLocationsSet = function(response, meetingId, userId) {
 
   return function(err, result) {
 
-	  mongoMeetings.getMeeting(meetingId, function(err, result) {
-		  gcm.sendNotification(result.members, { message: 'User has joined' }, false).then(function(resp) {
-			  logger.info('GCM Response: ' + JSON.stringify(resp));
-		  });
-		  //TODO: Check if the promise returned by sendNotification was successful
-	  });
+    mongoMeetings.getGcmIds(meetingId, function(err, results) {
+      gcm.sendNotification(results, {'message':'User has joined' }, false).then(function(resp) {
+        logger.info('GCM Response: ' + JSON.stringify(resp))
+      })
+    })
 
 	  response.status(202).send({"status": 202, "message": "Accepted"});
 
