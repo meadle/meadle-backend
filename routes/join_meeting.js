@@ -157,7 +157,7 @@ var onTopLocationsSet = function(response, meetingId, userId) {
 
 	  // Send GCM push notification to user with GCM ID userId
 	  gcm.sendNotification([userId], { message: 'Top Location Set' }, false).then(function(resp) {
-		  logger.info('GCM Response: ' + resp);
+		  logger.info('GCM Response: ' + JSON.stringify(resp));
 	  });
 	  //TODO: Check if the promise returned by sendNotification was successful
 
