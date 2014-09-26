@@ -1,7 +1,8 @@
 
 var logger = require("log4js").getLogger()
+var resbldr = require("../util/res_sender")
 
 module.exports = function(req, res) {
   logger.info("GET /")
-  res.status(200).send({'status': 200, 'message': 'Everything looks to be in good order.'})
+  resbldr.sendOK(res, "Everything looks to be in order")
 }

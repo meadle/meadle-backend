@@ -1,11 +1,11 @@
 
-var errbldr = require('../errors/builder')
+var resbldr = require('../util/res_sender')
+var gcm = require('../util/gcm')('AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo');
 var geo = require("../util/geo")
 var logger = require("log4js").getLogger()
-var mongoMeetings = require("../util/mongo_meetings")
-var mongoUsers = require("../util/mongo_users")
+var mongoMeetings = require("../mongodb/mongo_meetings")
+var mongoUsers = require("../mongodb/mongo_users")
 var yelp = require("../util/yelp")
-var gcm = require('../util/gcm')('AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo');
 
 /* READ THIS FIRST
  * SERIOUSLY
@@ -34,7 +34,7 @@ module.exports = function(req, res) {
 
   if (!meetingId || !me || !lat || !lng) {
     logger.warn("Client supplied an illformatted PUT body. Sending 400.")
-    res.status(400).send(errbldr.build400("PUT body was not formatted correctly"))
+    resbldr.sendBadRequest(res, "PUT body was not formatted correctly")
     return
   }
 
@@ -50,7 +50,7 @@ var onUserCreated = function(response, meetingId, userId) {
 
     if (err) {
       logger.error("Creating a user during join meeting failed in mongo. Sending 500")
-      response.status(500).send(errbldr.build500())
+      resbldr.sendInternalError(response)
       return
     }
 
@@ -67,64 +67,64 @@ var onGetMeeting = function(response, meetingId, userId) {
 
     if (err) {
       logger.error("Error getting meeting to update during user join. Sending 500.")
-      response.status(500).send(errbldr.build500())
+      resbldr.sendInternalError(response)
       return
     }
 
     if (!result) {
       logger.warn("Requested meeting id does not exist in storage")
-      response.status(404).send(errbldr.build404("No meeting by that id was found"))
+      resbldr.sendNotFound(response, "No meeting by that id was found")
       return
     }
 
     if (result.members.length >= 2) {
       logger.warn("User " + userId + " tried to join a meeting that already has 2 members.")
-      response.status(403).send(errbldr.build403("Meetings can only have two participants."))
+      resbldr.sendForbidden(response, "Meetings can only have two participants")
       return
     }
 
     // Add the member to the meeting
-    mongoMeetings.addMember(meetingId, userId, onMemberAdded(response, meetingId, userId))
+    mongoMeetings.addMember(meetingId, userId, onMemberAdded(response, result, userId))
 
   }
 
 }
 
-var onMemberAdded = function(response, meetingId, userId) {
+var onMemberAdded = function(response, meeting, userId) {
 
   return function(err, result) {
 
     if (err) {
       logger.error("Error adding member to meeting in mongo. Sending 500.")
-      response.status(500).send(errbldr.build500())
+      resbldr.sendInternalError(response)
       return
     }
 
     // Calculate and store the midpoint in mongo
-    geo.calcAndStoreMidpoint(meetingId, onMidpointStored(response, meetingId, userId))
+    geo.calcAndStoreMidpoint(meeting.meetingId, onMidpointStored(response, meeting, userId))
 
   }
 
 }
 
-var onMidpointStored = function(response, meetingId, userId) {
+var onMidpointStored = function(response, meeting, userId) {
 
   return function(err, result) {
 
     if (err) {
       logger.error("An error was thrown during midpoint calculation")
-      res.status(500).send(errbldr.build500())
+      resbldr.sendInternalError(response)
       return
     }
 
     // Query yelp for businesses
-    yelp.getBusinesses(result, onGetYelpBusinesses(response, meetingId, userId))
+    yelp.getBusinesses(result, onGetYelpBusinesses(response, meeting, userId))
 
   }
 
 }
 
-var onGetYelpBusinesses = function(response, meetingId, userId) {
+var onGetYelpBusinesses = function(response, meeting, userId) {
 
   return function(err, results) {
 
@@ -134,30 +134,38 @@ var onGetYelpBusinesses = function(response, meetingId, userId) {
         results = []
       } else {
         logger.error("An error was thrown during the yelp API call")
-        response.status(500).send(errbldr.build500())
+        resbldr.sendInternalError(response)
         return
       }
     }
 
     // Results should be a list of business IDs. Store them in mongo.
-    mongoMeetings.setTopLocations(meetingId, results, onTopLocationsSet(response, meetingId, userId))
+    mongoMeetings.setTopLocations(meeting.meetingId, results, onTopLocationsSet(response, meeting, userId))
 
   }
 
 }
 
-var onTopLocationsSet = function(response, meetingId, userId) {
+var onTopLocationsSet = function(response, meeting, userId) {
 
   return function(err, result) {
 
-	  mongoMeetings.getMeeting(meetingId, function(err, result) {
-		  gcm.sendNotification(result.members, { message: 'User has joined' }, false).then(function(resp) {
-			  logger.info('GCM Response: ' + JSON.stringify(resp));
-		  });
-		  //TODO: Check if the promise returned by sendNotification was successful
-	  });
+    if (err) {
+      logger.error("An error was thrown during setting top locations in mongo for meeting " + meetingId)
+      resbldr.sendInternalError(response)
+      return
+    }
 
-	  response.status(202).send({"status": 202, "message": "Accepted"});
+    // Send a notiication to all the users in the meeting
+    var members = meeting.members
+    var obj = { 'message': 'User has joined' }
+    gcm.sendNotification(members, obj, false).then(function(res) {
+      logger.info('GCM Response: ' + JSON.stringify(res))
+    })
+
+    var returnobj = {'status': 202, 'message': 'Accepted'}
+    resbldr.sendAccepted(response, returnobj)
+    return
 
   }
 
