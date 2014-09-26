@@ -1,9 +1,9 @@
 
 var async = require("async")
-var errbldr = require("../errors/builder")
+var resbldr = require("../util/res_sender")
 var logger = require("log4js").getLogger()
-var mongoMeetings = require("../util/mongo_meetings")
-var mongoUsers = require("../util/mongo_users")
+var mongoMeetings = require("../mongodb/mongo_meetings")
+var mongoUsers = require("../mongodb/mongo_users")
 
 module.exports = function(req, res) {
   logger.info("POST /meeting")
@@ -16,7 +16,7 @@ module.exports = function(req, res) {
 
   if (!me || !lat || !lng || !datetime) {
     logger.warn("Client supplied an illformatted POST body. Sending 400.")
-    res.status(400).send(errbldr.build400("POST body was not formatted correctly."))
+    resbldr.sendBadRequest(res, "POST body was not formatted correctly")
     return
   }
 
@@ -35,7 +35,7 @@ var onMongoUserCreated = function(response, meetingId, datetime, userId) {
 
     if (err) {
       logger.error("Mongo threw an error while creating a user during meeting creation. Sending 500 to client.")
-      response.status(500).send(errbldr.build500())
+      resbldr.sendInternalError(response)
       return
     }
 
@@ -53,12 +53,12 @@ var onMongoMeetingCreated = function(response, meetingId) {
 
     if (err) {
       logger.error("Mongo threw an error while creating a meeting. Sending 500 to client.")
-      response.status(500).send(errbldr.build500())
+      resbldr.sendInternalError(response)
       return
     }
 
     var returnObj = {"meetingId": meetingId}
-    response.status(201).send(returnObj)
+    resbldr.sendCreated(response, returnObj)
 
   }
 

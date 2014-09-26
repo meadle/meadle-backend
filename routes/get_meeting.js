@@ -1,5 +1,5 @@
 
-var errbldr = require("../errors/builder")
+var resbldr = require("../util/res_sender")
 var logger = require("log4js").getLogger()
 var meetingModel = require("../models/meeting")
 var mongoMeetings = require("../util/mongo_meetings")
@@ -16,7 +16,7 @@ module.exports = function(req, res) {
   // Validate it
   if (!meetingId || !userId) {
     logger.warn("Client provided illformatted parameters in GET, sending 400")
-    res.status(400).send(errbldr.build400("Incorrect format. Please provide meeting id and user id as per API docs."))
+    resbldr.sendBadRequest(res, "MeetingId or UserId not provided correctly")
     return
   }
 
@@ -31,13 +31,13 @@ var onGetMeeting = function(res, meetingId, userId) {
 
     if (err) {
       logger.error("Mongo returned an error on query. Sending 500 to client.")
-      res.status(500).send(errbldr.build500())
+      resbldr.sendInternalError(res)
       return
     }
 
     if (!result) {
       logger.warn("Queried meeting id " + meetingId + " does not exist in mongo. Returning 404 to client.")
-      res.status(404).send(errbldr.build404("The requested meeting id could not be found."))
+      resbldr.sendNotFound(res, "The requested meeting id could not be found")
       return
     }
 
@@ -45,7 +45,7 @@ var onGetMeeting = function(res, meetingId, userId) {
 
     if (members.indexOf(userId) === -1) {
       logger.warn("The client is not authorized to view meeting " + meetingId + ", sending 401.")
-      res.status(401).send(errbldr.build401())
+      resbldr.sendUnauthorized(res)
       return
     }
 
@@ -53,7 +53,7 @@ var onGetMeeting = function(res, meetingId, userId) {
     var meeting = meetingModel.filter(result)
 
     // Send the result to the client
-    res.status(200).send(meeting)
+    resbldr.sendOK(res, meeting)
 
   }
 
