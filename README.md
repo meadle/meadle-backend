@@ -41,3 +41,9 @@ Right now we are deploying to heroku.
 Alternatively, if you don't want to set up a heroku account, just push your changes to github and ping Michael/Kyle on slack to deploy for you.
 
 Then, visit meadle.herokuapp.com:80 to see the app. 
+
+
+Ignoring CI
+=============
+
+add add a --skip-ci to the commit 
