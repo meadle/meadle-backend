@@ -69,14 +69,4 @@ describe('MongoDB Wrappers', function() {
 
   })
 
-  it('get gcmids from mongo', function(done) {
-
-    mongoMeetings.getGcmIds(meetingId, function(err, results) {
-      if (err) throw err
-      should(results).be.instanceof(Array)
-      done()
-    })
-
-  })
-
 })
