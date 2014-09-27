@@ -55,7 +55,7 @@ exports.getGcmIds = function(meetingId, mCallback) {
 
       // Get the member's userobject
       mongoUsers.getUser(member, meetingId, function(err, result) {
-        callback(err, result.gcm)
+        callback(err, result.userId)
       })
 
     }, function(err, results) {

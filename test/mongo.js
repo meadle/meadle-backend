@@ -45,6 +45,7 @@ describe('MongoDB Wrappers', function() {
 
     var user = {
       'userId': u1id,
+      'meetingId': meetingId,
       'lat': 12.34,
       'lng': 56.78
     }
