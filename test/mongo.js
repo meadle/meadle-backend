@@ -45,7 +45,6 @@ describe('MongoDB Wrappers', function() {
 
     var user = {
       'userId': u1id,
-      'gcm': '90j390fj2093jf9023jf902j390fj2903fj0293fj9023jf9023jf',
       'lat': 12.34,
       'lng': 56.78
     }
