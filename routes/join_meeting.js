@@ -29,18 +29,17 @@ module.exports = function(req, res) {
   // Extract from post data
   var meetingId = req.param("meetingId")
   var me = req.body.userId
-  var gcm = req.body.gcm
   var lat = req.body.lat
   var lng = req.body.lng
 
-  if (!meetingId || !gcm || !me || !lat || !lng) {
+  if (!meetingId || !me || !lat || !lng) {
     logger.warn("Client supplied an illformatted PUT body. Sending 400.")
     res.status(400).send(errbldr.build400("PUT body was not formatted correctly"))
     return
   }
 
   // Create the user in mongo
-  var user = {"userId": me, "lat": lat, "lng": lng}
+  var user = {"userId": me, "meetingId": meetingId, "lat": lat, "lng": lng}
   mongoUsers.createUser(user, onUserCreated(res, meetingId, me))
 
 }
@@ -151,10 +150,19 @@ var onTopLocationsSet = function(response, meetingId, userId) {
 
   return function(err, result) {
 
-    mongoMeetings.getGcmIds(meetingId, function(err, results) {
-      gcm.sendNotification(results, {'message':'User has joined' }, false).then(function(resp) {
-        logger.info('GCM Response: ' + JSON.stringify(resp))
+    mongoMeetings.getMeeting(meetingId, function(err, result) {
+
+      if (err) {
+        logger.error("Error thrown during get meeting 2 for user join meeting")
+        response.status(500).send(errbldr.build500())
+        return
+      }
+
+      var gcmIds = result.members
+      gcm.sendNotification(gcmIds, {'message': 'User has joined' }, false).then(function(gcmResponse) {
+        logger.info('GCM: ' + JSON.stringify(gcmResponse))
       })
+
     })
 
 	  response.status(202).send({"status": 202, "message": "Accepted"});

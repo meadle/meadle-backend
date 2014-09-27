@@ -29,47 +29,6 @@ exports.getMeeting = function(meetingId, callback) {
 }
 
 /*
- * Returns the GCM ids of every user in a meeting by meeting Id
- *
- * @param meetingId   the meetingId the backend generates in POST /meeting
- * @param callback    function(err, result)
- *
- * @returns callback(result)  [ "gcmId", "gcmId", "gcmId" ... ]
- * @returns callback(err)     if error occurs in mongo
- */
-exports.getGcmIds = function(meetingId, mCallback) {
-  logger.trace("mongo.getGcmIds() : Retrieving GCM ids by meeting Id " + meetingId)
-
-  // Get the meeting object
-  exports.getMeeting(meetingId, function(err, result) {
-
-    if (err) {
-      mCallback(err, result)
-      return
-    }
-
-    // Get the list of members and retrieve a userobject for each one
-    var members = result.members
-    var gcmids = []
-    async.map(members, function(member, callback) {
-
-      // Get the member's userobject
-      mongoUsers.getUser(member, function(err, result) {
-        callback(err, result.gcm)
-      })
-
-    }, function(err, results) {
-
-      // results now contains each gcmid in an array
-      mCallback(err, results)
-
-    })
-
-  })
-
-}
-
-/*
  * Creates a meeting in mongo.
  *
  * @param   meeting   a meeting object with the field 'id', 'datetime', and 'members' set

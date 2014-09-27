@@ -45,7 +45,7 @@ describe('MongoDB Wrappers', function() {
 
     var user = {
       'userId': u1id,
-      'gcm': '90j390fj2093jf9023jf902j390fj2903fj0293fj9023jf9023jf',
+      'meetingId': meetingId,
       'lat': 12.34,
       'lng': 56.78
     }
@@ -64,16 +64,6 @@ describe('MongoDB Wrappers', function() {
       should(result.meetingId).be.a.String
       should(result.datetime).be.a.String
       should(result).have.property('members')
-      done()
-    })
-
-  })
-
-  it('get gcmids from mongo', function(done) {
-
-    mongoMeetings.getGcmIds(meetingId, function(err, results) {
-      if (err) throw err
-      should(results).be.instanceof(Array)
       done()
     })
 
