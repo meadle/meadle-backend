@@ -5,7 +5,7 @@ var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
 var mongoUsers = require("../util/mongo_users")
 var yelp = require("../util/yelp")
-var gcm = require('../util/gcm')('AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo');
+var gcm = require('../util/gcm')
 
 /* READ THIS FIRST
  * SERIOUSLY
@@ -29,18 +29,17 @@ module.exports = function(req, res) {
   // Extract from post data
   var meetingId = req.param("meetingId")
   var me = req.body.userId
-  var gcm = req.body.gcm
   var lat = req.body.lat
   var lng = req.body.lng
 
-  if (!meetingId || !gcm || !me || !lat || !lng) {
+  if (!meetingId || !me || !lat || !lng) {
     logger.warn("Client supplied an illformatted PUT body. Sending 400.")
     res.status(400).send(errbldr.build400("PUT body was not formatted correctly"))
     return
   }
 
   // Create the user in mongo
-  var user = {"userId": me, "lat": lat, "lng": lng}
+  var user = {"userId": me, "meetingId": meetingId, "lat": lat, "lng": lng}
   mongoUsers.createUser(user, onUserCreated(res, meetingId, me))
 
 }
@@ -157,13 +156,27 @@ var onTopLocationsSet = function(response, meetingId, userId) {
 
   return function(err, result) {
 
-    mongoMeetings.getGcmIds(meetingId, function(err, results) {
-      gcm.sendNotification(results, {'message':'User has joined' }, false).then(function(resp) {
-        logger.info('GCM Response: ' + JSON.stringify(resp))
-      })
-    })
+    mongoMeetings.getMeeting(meetingId, onGetMeetingTwo(response, meetingId, userId))
 
-	  response.status(202).send({"status": 202, "message": "Accepted"});
+  }
+
+}
+
+var onGetMeetingTwo = function(response, meetingId, userId) {
+
+  return function(err, result) {
+
+    if (err) {
+      logger.error("Error thrown during get meeting 2 for user join meeting")
+      response.status(500).send(errbldr.build500())
+      return
+    }
+
+    var gcmIds = result.members
+
+    gcm.sendUserJoined(gcmIds, userId)
+
+    response.status(202).send({"status": 202, "message": "Accepted"});
 
   }
 

@@ -18,6 +18,9 @@ app.post("/meeting", require("./routes/create_meeting"))
 app.put("/meeting/:meetingId/join", require("./routes/join_meeting"))
 app.put("/meeting/:meetingId/vote", require("./routes/vote_meeting"))
 
+// Debug routes
+app.get("/debug/gcm/userjoin", require('./routes/debug').sendUserJoinedGcm)
+
 // Set up mongo db
 mongo.init(function(err, results) {
 
