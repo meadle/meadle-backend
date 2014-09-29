@@ -150,22 +150,29 @@ var onTopLocationsSet = function(response, meetingId, userId) {
 
   return function(err, result) {
 
-    mongoMeetings.getMeeting(meetingId, function(err, result) {
+    mongoMeetings.getMeeting(meetingId, onGetMeetingTwo(response, meetingId, userId))
 
-      if (err) {
-        logger.error("Error thrown during get meeting 2 for user join meeting")
-        response.status(500).send(errbldr.build500())
-        return
-      }
+  }
 
-      var gcmIds = result.members
-      gcm.sendNotification(gcmIds, {'message': 'User has joined' }, false).then(function(gcmResponse) {
-        logger.info('GCM: ' + JSON.stringify(gcmResponse))
-      })
+}
 
-    })
+var onGetMeetingTwo = function(response, meetingId, userId) {
 
-	  response.status(202).send({"status": 202, "message": "Accepted"});
+  return function(err, result) {
+
+    if (err) {
+      logger.error("Error thrown during get meeting 2 for user join meeting")
+      response.status(500).send(errbldr.build500())
+      return
+    }
+
+    var gcmIds = result.members
+
+    response.status(202).send({"status": 202, "message": "Accepted"});
+
+    gcm.sendUserJoined(gcmIds, userId)
+
+
 
   }
 
