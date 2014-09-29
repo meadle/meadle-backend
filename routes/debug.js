@@ -2,7 +2,7 @@
 var gcm = require('../util/gcm')
 var logger = require('log4js').getLogger()
 
-exports.sendUserJoinedGcm(req, res) {
+exports.sendUserJoinedGcm = function(req, res) {
 
   var gcmid = req.param['gcm']
 
