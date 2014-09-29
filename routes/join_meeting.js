@@ -5,7 +5,7 @@ var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
 var mongoUsers = require("../util/mongo_users")
 var yelp = require("../util/yelp")
-var gcm = require('../util/gcm')('AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo');
+var gcm = require('../util/gcm')
 
 /* READ THIS FIRST
  * SERIOUSLY

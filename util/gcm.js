@@ -1,57 +1,71 @@
+
 var logger = require('log4js').getLogger();
 var request = require('request');
 var Q = require('q');
 
-module.exports = function(gcmKey) {
-	return {
-		sendNotification: function(registrationIds, data, dry_run) {
-			// This probably doesn't need to be an async function because 
-			// I have observed GCM responding to requests in under a second historically.
+var gcmkey = "AIzaSyAHjol3Ke9-HGOl9O4wEWl8r9lwvnjqkVo"
 
-			// Valid requestBody params can be found here: http://developer.android.com/google/gcm/server.html#params
-			var requestBody = {
-				'registration_ids'	: registrationIds,
-				'data'				: data,
-			};
+exports.sendUserJoinedGcm = function(sendIds, joinedId, dryrun) {
+	var data = {
+		'phase': 'JOINED',
+		'userId': userId
+	}
+	sendMessage(sendIds, data, dryrun)
+}
 
-			var promise = Q.defer();
+exports.sendVotingStarted = function(sendIds, topLocations, dryrun) {
+	var data = {
+		'phase': 'START_VOTING',
+		'topLocations': topLocations
+	}
+	sendMessage(sendIds, data, dryrun)
+}
 
-			var requestOptions = {
-				url: 'https://android.googleapis.com/gcm/send', 
-				body: requestBody, 
-				json: true, 
-				headers: { 
-					'Authorization': 'key=' + gcmKey, 
-					'Content-Type': 'application/json' 
-				
-				}
-			};
+exports.sendVotingFinished = function(sendIds, finalLocation, dryrun) {
+	var data = {
+		'phase': 'END_VOTING',
+		'location': finalLocation
+	}
+	sendMessage(sendIds, data, dryrun)
+}
 
-			function doGcmRequest(requestOptions) {
-				request.post(requestOptions, handleGcmResponse);
-			}
+var sendMessage = function(ids, data, dryrun) {
 
-			function handleGcmResponse(err, msg, body) {
-				if(err) {
-					// TODO: If registration_ids error, then raise error
-					if(msg.statusCode >= 500 && msg.statusCode <= 599) {
-						// Errors in the 500-599 range (such as 500 or 503) indicate that 
-						// there was an internal error in the GCM server while trying to 
-						// process the request, or that the server is temporarily unavailable 
-						// (for example, because of timeouts). Sender must retry later, honoring 
-						// any Retry-After header included in the response.
-						setTimeout(msg.getHeader('Retry-After'), doGcmRequest(requestOptions));
-						return;
-					}
-					promise.reject(msg);
-				} else {
-					promise.resolve(msg);	
-				}
-			}
+	var requestBody = {
+		'registration_ids': ids,
+		'data': data
+	}
 
-			doGcmRequest(requestOptions);
+	var promise = Q.defer()
 
-			return promise.promise;
+	var requestOptions = {
+		'url': 'https://android.googleapis.com/gcm/send',
+		'body': requestBody,
+		'json': true,
+		'headers': {
+			'Authorization': 'key=' + gcmkey,
+			'Content-Type': 'application/json'
 		}
 	}
-};
+
+	var doGcmRequest = function() {
+		request.post(requestOptions, handleGcmResponse)
+	}
+	doGcmRequest()
+
+	var handleGcmResponse = function() {
+
+		if (err) {
+			if (msg.statusCode >= 500 && msg.statusCode <= 599) {
+				setTimeout(msg.getHeader('Retry-After'), doGcmRequest)
+				return
+			}
+			promise.reject(msg)
+			return
+		}
+		promise.resolve(msg)
+	}
+
+	return promise.promise
+
+}
