@@ -20,7 +20,7 @@ exports.calcAndStoreMidpoint = function(meetingId, mCallback) {
 
     async.map(result.members, function(member, callback) {
 
-      mongoUsers.getUser(member, function(err, result) {
+      mongoUsers.getUser(member, meetingId, function(err, result) {
         callback(err, result);
       });
 
