@@ -41,7 +41,7 @@ var sendMessage = function(senderIds, data) {
 exports.sendUserJoined = function(senderIds, userIdJoined) {
 	var data = {
 		'phase': 'USER_JOINED',
-		'userId': userId
+		'userId': userIdJoined
 	}
 	sendMessage(senderIds, data)
 }

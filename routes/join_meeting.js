@@ -168,11 +168,9 @@ var onGetMeetingTwo = function(response, meetingId, userId) {
 
     var gcmIds = result.members
 
-    response.status(202).send({"status": 202, "message": "Accepted"});
-
     gcm.sendUserJoined(gcmIds, userId)
 
-
+    response.status(202).send({"status": 202, "message": "Accepted"});
 
   }
 
