@@ -10,6 +10,7 @@ module.exports = function(req, res) {
   var meetingId = req.param("meetingId")
   var userId = req.param("userId")
   var votes = req.body.ranked
+  logger.info(votes)
 
   if (!meetingId || !userId || !votes) {
     logger.warn("Client supplied an illformatted PUT body. Sending 400.")
@@ -43,24 +44,14 @@ var onGetMeeting = function(res, meetingId, userId, votes) {
     // Get the top locations already voted on
     var topLocations = result.topLocations
 
-    // Run through the entire list the user gave once to ensure it is accurate with what we're storing in mongo
-    keys(topLocations).forEach(function(yelpId) {
-      var index = votes.indexOf(yelpId)
-
-      if (index === -1) {
-        logger.warn("Client provided an incorrect list of yelp Ids")
-        logger.warn(yelpId + " exists in mongo but was not provided by the user")
-        res.status(400).send({'error': 400, 'message': 'Yelp Id list provided is incorrect'})
-        return
-      }
-    })
-
     // Now run through it again for real
     var position = 0
-    keys(topLocations).forEach(function(yelpId) {
-      var index = votes.indexOf(yelpId)
-      topLocations[yelpId] += (votes.length - (position++))
+    votes.forEach(function(yelpid) {
+      var index = votes.indexOf(yelpid)
+      var newVote = topLocations[yelpId] + (votes.length - index)
+      topLocations[yelpId] = newVote
     })
+    logger.info(topLocations)
 
     // Re-set this object in mongo
     // I feel like this entire function is a huge race condition...
@@ -76,19 +67,17 @@ var onGetMeeting = function(res, meetingId, userId, votes) {
       // Calculate the current winner
       var max = -1
       var top = ""
-      keys(topLocations).forEach(function(yelpId) {
+      Object.keys(topLocations).forEach(function(yelpId) {
         if (topLocations[yelpId] > max) {
           max = topLocations[yelpId]
           top = yelpId
         }
       })
 
-      // Get list of all users
-      mongoMeetings.getGcmIds(meetingId, function(err, results) {
-        gcm.sendNotification(results, {'topLocation':top}, false).then(function(response) {
-          res.status(202).send()
-        })
-      })
+      // Send gcm to members
+      gcm.sendVotingFinished(result.members, top)
+
+      res.status(202).send()
 
     })
 
