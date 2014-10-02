@@ -9,8 +9,16 @@ exports.filter = function(meeting) {
   var newMeeting = {}
   newMeeting.meetingId = meeting.meetingId;
   newMeeting.datetime = meeting.datetime;
-  newMeeting.topLocations = meeting.topLocations;
-  newMeeting.location = meeting.location;
+  newMeeting.location = meeting.finalLocation;
+
+  // For the top loctions field, filter out the votes
+  if (meeting.topLocations) {
+    var tl = []
+    Object.keys(meeting.topLocations).forEach(function(meeting) {
+      tl.push(meeting)
+    })
+    newMeeting.topLocations = tl
+  }
 
   // Ignored fields:
   // meeting.lat

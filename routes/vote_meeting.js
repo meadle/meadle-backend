@@ -48,38 +48,55 @@ var onGetMeeting = function(res, meetingId, userId, votes) {
     var position = 0
     votes.forEach(function(yelpid) {
       var index = votes.indexOf(yelpid)
-      var newVote = topLocations[yelpId] + (votes.length - index)
-      topLocations[yelpId] = newVote
+      var newVote = topLocations[yelpid] + (votes.length - index)
+      topLocations[yelpid] = newVote
     })
     logger.info(topLocations)
 
     // Re-set this object in mongo
     // I feel like this entire function is a huge race condition...
-    mongoMeetings.setTopLocations(meetingId, topLocations, function(err, result) {
+    mongoMeetings.setTopLocations(result.meetingId, topLocations, onSetTopLocations(res, result, userId, topLocations))
 
-      if (err) {
-        loggeer.error("Error setting top locations for meetings in mongo")
-        res.status(500).send("internal thingy")
-        return
+  }
+
+}
+
+var onSetTopLocations = function(res, meeting, userId, topLocations) {
+
+  return function(err, result) {
+
+    if (err) {
+      loggeer.error("Error setting top locations for meetings in mongo")
+      res.status(500).send("internal thingy")
+      return
+    }
+
+    // At this point we're going to assume there are only two users, this will be improved later
+    // Calculate the current winner
+    var max = -1
+    var top = ""
+    Object.keys(topLocations).forEach(function(yelpId) {
+      if (topLocations[yelpId] > max) {
+        max = topLocations[yelpId]
+        top = yelpId
       }
-
-      // At this point we're going to assume there are only two users, this will be improved later
-      // Calculate the current winner
-      var max = -1
-      var top = ""
-      Object.keys(topLocations).forEach(function(yelpId) {
-        if (topLocations[yelpId] > max) {
-          max = topLocations[yelpId]
-          top = yelpId
-        }
-      })
-
-      // Send gcm to members
-      gcm.sendVotingFinished(result.members, top)
-
-      res.status(202).send()
-
     })
+
+    // Set the top location
+    mongoMeetings.setFinalLocation(meeting.meetingId, top, onFinalLocationSet(res, meeting, userId, topLocations, top))
+
+  }
+
+}
+
+var onFinalLocationSet = function(res, meeting, userId, meetingVotes, top) {
+
+  return function(err, result) {
+
+    // Send gcm to members
+    gcm.sendVotingFinished(meeting.members, top)
+
+    res.status(202).send()
 
   }
 

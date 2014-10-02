@@ -6,7 +6,7 @@ var meetingId;
 var BASE_URL = "http://localhost:3000/"
 
 var shuffle = function(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex ;
+  var currentIndex = array.length, temporaryValue, randomIndex;
 
   // While there remain elements to shuffle...
   while (0 !== currentIndex) {
@@ -98,6 +98,8 @@ describe('Meeting Endpoints (Happy Path)', function() {
   })
 
   var topLocations = []
+  var test_user1_votes = []
+  var test_user2_votes = []
 
   it('get /meeting/{id} second user', function(done) {
 
@@ -107,21 +109,19 @@ describe('Meeting Endpoints (Happy Path)', function() {
         should(res.status).eql(200)
         should(res.body).have.property("meetingId")
         should(res.body).have.property("datetime")
+        should(res.body).have.property("topLocations")
         should(res.body.meetingId).be.a.String
         should(res.body.datetime).be.a.String
 
         // Save the list of top locations
         topLocations = res.body.topLocations
-        console.log(topLocations)
-
+        test_user1_votes = shuffle(topLocations)
+        test_user2_votes = shuffle(topLocations)
         done()
 
       })
 
   })
-
-  var test_user1_votes = shuffle(topLocations)
-  var test_user2_votes = shuffle(topLocations)
 
   it('put /meeting/{id}/vote first user', function(done) {
 
@@ -136,6 +136,39 @@ describe('Meeting Endpoints (Happy Path)', function() {
       })
   })
 
+  it('put /meeting/{id}/vote second user', function(done) {
+
+    superagent.put(BASE_URL + 'meeting/' + test_meeting_id + "/vote?userId=" + test_user_id)
+      .send({'ranked': test_user2_votes})
+      .end(function(err, res) {
+
+        should(res.status).eql(202)
+
+        done()
+
+      })
+
+  })
+
+  it('get /meeting/{id} final location', function(done) {
+
+    superagent.get(BASE_URL + 'meeting/' + test_meeting_id + "?userId=" + test_user2_id)
+      .end(function(err, res) {
+
+        should(res.status).eql(200)
+        should(res.body).have.property("meetingId")
+        should(res.body).have.property("datetime")
+        should(res.body).have.property("topLocations")
+        should(res.body).have.property("location")
+        should(res.body.meetingId).be.a.String
+        should(res.body.datetime).be.a.String
+        should(res.body.location).be.a.String
+
+        done()
+
+      })
+
+  })
 
 
 })
