@@ -27,23 +27,20 @@ Running
 2. Visit `localhost:3000` to confirm it works
 
 
+Testing
+=======
+
+`run.sh` automates all of the following steps
+
+1. Run an instance of the mongodb server with `mongod`
+
+2. Run an instance of the meadle-backend server with `node server.js`
+
+3. Run the tests with `mocha`
+
 Deploying Changes
 =================
 
-Right now we are deploying to heroku.
+Commits to the master branch of this github repository will initiate our build process on codeship.io then automatically deploy to heroku on completion.
 
-1. `git remote add heroku git@heroku.com:meadle.git`
-
-2. Ask Michael to add you as a contributor to the heroku project
-
-3. `git push heroku master`
-
-Alternatively, if you don't want to set up a heroku account, just push your changes to github and ping Michael/Kyle on slack to deploy for you.
-
-Then, visit meadle.herokuapp.com:80 to see the app. 
-
-
-Ignoring CI
-=============
-
-add add a --skip-ci to the commit 
+Note that we have 100 builds per month on codeship. If you are just pushing to a development branch, please add `--skip-ci` to the commit message.
