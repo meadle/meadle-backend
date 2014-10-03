@@ -17,7 +17,7 @@ exports.sendAccepted = function(res, body) {
   res.status(202).send(body)
 }
 
-exports.sendBadRequest = function(res, message)) {
+exports.sendBadRequest = function(res, message) {
   var o = {
     'error': 400,
     'message': message
