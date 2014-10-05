@@ -4,5 +4,7 @@ var responder = require("../util/response")
 
 module.exports = function(req, res) {
   logger.info("GET /")
-  responder.sendOk(res, {'status': 200, 'message': 'Everything looks to be in good order.'})
+  res.send("Meadle! The best way to find a place to meet someone!\n" +
+    "You should totally just install the Meadle android application though.\n" +
+    "We don't really have much of a website :(")
 }
