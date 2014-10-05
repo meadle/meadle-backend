@@ -33,10 +33,6 @@ describe('Root URL', function() {
       .end(function(err, res) {
 
         should(res.status).eql(200)
-        should(res.body).have.property("status")
-        should(res.body.status).eql(200)
-        should(res.body).have.property("message")
-        should(res.body.message).be.a.String
         done()
 
       })
