@@ -24,11 +24,11 @@ module.exports = function(req, res) {
   for (i = 0; i < 9; i++) {
     mida[i] = Math.floor(Math.random()*9)
   }
-  var mid = mida.join("")
+  var meetingId = mida.join("")
 
   // Create the user in mogno
-  var user = {"userId": me, "meetingId": mid, "lat": lat, "lng": lng}
-  mongoUsers.createUser(user, onMongoUserCreated(res, mid, datetime, me))
+  var user = {"userId": me, "meetingId": meetingId, "lat": lat, "lng": lng}
+  mongoUsers.createUser(user, onMongoUserCreated(res, meetingId, datetime, me))
 
 }
 
