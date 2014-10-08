@@ -22,3 +22,7 @@ deploy:
     secure: KNNPQU7mrmBfCpaWREF4T9f22pAKQQ8oI0Qz9qTQ4rlbEwFHCSUGmCLZt42kmKa+WZSD/O2No5lh0wAS4aABMQnjuWhTIBCEuK76AqjVHcPTPsnFW0otLoAa1Hk1wiXnC0hBl+ER2AxpWm3oaz7i+RFC091FArdwtC3mN4dvETc=
   app: meadle
   on: master
+
+notification:
+  email:
+    - mike@hockerman.com
