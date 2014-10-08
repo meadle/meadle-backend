@@ -18,8 +18,11 @@
     "superagent": "^0.18.2",
     "supertest": "^0.13.0",
     "yelp": "*",
-	"q": "*",
-	"chai-as-promised": "*",
-	"request": "*"
+    "q": "*",
+    "chai-as-promised": "*",
+    "request": "*"
+  },
+  "scripts": {
+	"test": "mocha"
   }
 }
