@@ -6,5 +6,9 @@ node_js:
   - "0.6"
 services:
   - "mongodb"
-before_scripts:
+
+before_script:
   - "node server.js"
+script:
+  - "npm test"
+
