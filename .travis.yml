@@ -1,15 +1,24 @@
 language: node_js
-node_js:
-  - "0.11"
-  - "0.10"
-  - "0.8"
-  - "0.6"
-services:
-  - "mongodb"
 
+node_js:
+- '0.11'
+- '0.10'
+
+services:
+- mongodb
+
+install:
+- npm install
 
 before_script:
-  - "node server.js &> /dev/null &"
-script:
-  - "npm test"
+- node server.js &> /dev/null &
 
+script:
+- npm test
+
+deploy:
+  provider: heroku
+  api_key:
+    secure: KNNPQU7mrmBfCpaWREF4T9f22pAKQQ8oI0Qz9qTQ4rlbEwFHCSUGmCLZt42kmKa+WZSD/O2No5lh0wAS4aABMQnjuWhTIBCEuK76AqjVHcPTPsnFW0otLoAa1Hk1wiXnC0hBl+ER2AxpWm3oaz7i+RFC091FArdwtC3mN4dvETc=
+  app: meadle
+  on: master
