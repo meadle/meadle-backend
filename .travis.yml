@@ -7,8 +7,9 @@ node_js:
 services:
   - "mongodb"
 
+
 before_script:
-  - "node server.js"
+  - "node server.js &> /dev/null &"
 script:
   - "npm test"
 
