@@ -39,6 +39,7 @@ var sendMessage = function(senderIds, data) {
 }
 
 exports.sendUserJoined = function(senderIds, userIdJoined) {
+	logger.info("Sending user joined to all members")
 	var data = {
 		'phase': 'USER_JOINED',
 		'userId': userIdJoined
@@ -47,6 +48,7 @@ exports.sendUserJoined = function(senderIds, userIdJoined) {
 }
 
 exports.sendAllUsersJoined = function(senderIds, topLocations) {
+	logger.info("Sending all users joined gcm to members")
 	var data = {
 		'phase': 'VOTING_STARTED',
 		'topLocations': topLocations
@@ -55,6 +57,7 @@ exports.sendAllUsersJoined = function(senderIds, topLocations) {
 }
 
 exports.sendVotingFinished = function(senderIds, finalLocation) {
+	logger.info("Sending voting finished gcm to members")
 	var data = {
 		'phase': 'VOTING_FINISHED',
 		'location': finalLocation
