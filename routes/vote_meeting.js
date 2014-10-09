@@ -117,7 +117,7 @@ var onNVotedIncrement = function(res, meeting, top) {
       return
     }
 
-    if (result.nVotes == result.members.length) {
+    if (result.nVoted === 2) {
       // Send gcm to members
       gcm.sendVotingFinished(meeting.members, top)
     }
