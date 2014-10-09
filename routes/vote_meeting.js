@@ -100,8 +100,27 @@ var onFinalLocationSet = function(res, meeting, userId, meetingVotes, top) {
       return
     }
 
-    // Send gcm to members
-    gcm.sendVotingFinished(meeting.members, top)
+    // Increment the number of meetings
+    mongoMeetings.incrementNVoted(meeting.meetingId, onNVotedIncrement(res, meeting, top))
+
+  }
+
+}
+
+var onNVotedIncrement = function(res, meeting, top) {
+
+  return function(err, result) {
+
+    if (err) {
+      logger.error("Error incrementing nvoted in mongo")
+      responder.sendInternal(res)
+      return
+    }
+
+    if (result.nVotes == result.members.length) {
+      // Send gcm to members
+      gcm.sendVotingFinished(meeting.members, top)
+    }
 
     var obj = {'status': 202, 'message':'Accepted'}
     responder.sendAccepted(res, obj)

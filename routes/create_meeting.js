@@ -43,7 +43,7 @@ var onMongoUserCreated = function(response, meetingId, datetime, userId) {
     }
 
     // Create the meeting afterward
-    var meeting = {"meetingId": meetingId, "datetime": datetime, "members": [userId]}
+    var meeting = {"meetingId": meetingId, "datetime": datetime, "members": [userId], "nVoted": 0}
     mongoMeetings.createMeeting(meeting, onMongoMeetingCreated(response, meetingId))
 
   }
