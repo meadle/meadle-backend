@@ -1,5 +1,5 @@
 
-[ ![Codeship Status for mhoc/meadle-backend](https://codeship.io/projects/f085b1d0-1e04-0132-d672-1642395b3d51/status)](https://codeship.io/projects/35479)
+[![Build Status](https://magnum.travis-ci.com/mhoc/meadle-backend.svg?token=noEZqHCNie4E6CC2GGKT&branch=master)](https://magnum.travis-ci.com/mhoc/meadle-backend)
 
 Pre-Reqs
 ========
