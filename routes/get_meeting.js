@@ -1,7 +1,7 @@
 
+var fbm = require('../firebase/meetings')
 var logger = require("log4js").getLogger()
 var meetingModel = require("../models/meeting")
-var mongoMeetings = require("../util/mongo_meetings")
 var responder = require('../util/response')
 
 module.exports = function(req, res) {
@@ -11,50 +11,55 @@ module.exports = function(req, res) {
   var meetingId = req.param("meetingId")
 
   // Extract the user Id
-  var userId = req.param("userId")
+  var gcm = req.param("userId")
 
   // Validate it
-  if (!meetingId || !userId) {
-    logger.warn("Client provided illformatted parameters in GET, sending 400")
-    responder.sendBadRequest(res, "Incorrect format. Please provide meeting id and user id as per API docs.")
+  if (!meetingId || !gcm) {
+    var message = "Client provided illformatted parameters."
+    logger.warn(message)
+    responder.sendBadRequest(res, message)
     return
   }
 
-  // Query mongo for the meeting
-  mongoMeetings.getMeeting(meetingId, onGetMeeting(res, meetingId, userId))
+  // Query database for meeting
+  var qm = fbm.getMeeting(meetingId)
+  qm.then(onResolve(res, gcm), onReject(res))
 
 }
 
-var onGetMeeting = function(res, meetingId, userId) {
+var onResolve = function(res, gcm) {
+  return function(result) {
 
-  return function(err, result) {
+    // Confirm the user has permission to access this meeting
+    var contains = false
+    console.log(result.members instanceof Array)
+    Object.keys(result.members).forEach(function(userId) {
+      if (userId === gcm) {
+        contains = true
+      }
+      if (result.members[userId].gcm === gcm) {
+        contains = true
+      }
+    })
 
-    if (err) {
-      logger.error("Mongo returned an error on query. Sending 500 to client.")
-      responder.sendInternal(res)
-      return
-    }
-
-    if (!result) {
-      logger.warn("Queried meeting id " + meetingId + " does not exist in mongo. Returning 404 to client.")
-      responder.sendNotFound(res, "The requested meeting id could not be found.")
-      return
-    }
-
-    var members = result.members
-
-    if (members.indexOf(userId) === -1) {
-      logger.warn("The client is not authorized to view meeting " + meetingId + ", sending 401.")
+    if (!contains) {
+      logger.warn("User " + gcm + " is unauthorized to obtain this meeting")
       responder.sendUnauthorized(res)
       return
     }
 
-    // Filter the meeting of any sensitive information
-    var meeting = meetingModel.filter(result)
+    // Purge the object of any protected fields
+    var nresult = {}
+    nresult.datetime = result.datetime
+    nresult.nMembers = result.nMembers
+    nresult.nVoted = result.nVoted
 
-    // Send the result to the client
-    responder.sendOk(res, meeting)
-
+    responder.sendOk(res, nresult)
   }
+}
 
+var onReject = function(res) {
+  return function(err) {
+    responder.sendInternal(res)
+  }
 }
