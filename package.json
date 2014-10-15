@@ -9,6 +9,7 @@
     "async": "*",
     "expect": "^0.1.1",
     "express": "3.3.x",
+    "firebase": "*",
     "log4js": "^0.6.21",
     "mocha": "^1.21.4",
     "mongodb": "*",
@@ -23,6 +24,6 @@
     "request": "*"
   },
   "scripts": {
-	"test": "mocha"
+	   "test": "mocha"
   }
 }
