@@ -34,6 +34,12 @@ var onGetMeeting = function(res, meetingId, userId, votes) {
       return
     }
 
+    if (!result) {
+      logger.warn("Client requested a meeting that does not exist")
+      responder.sendNotFound(res, "Meeting requested could not be found")
+      return
+    }
+
     // Verify that the user is a member of the meeting
     var members = result.members
     if (members.indexOf(userId) === -1) {
