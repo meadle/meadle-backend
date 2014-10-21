@@ -1,4 +1,5 @@
 
+var comeback = require('comeback')
 var gcm = require('../util/gcm')
 var logger = require('log4js').getLogger()
 var responder = require('../util/response')
@@ -9,6 +10,6 @@ exports.sendUserJoinedGcm = function(req, res) {
 
   gcm.sendUserJoined([gcmid], "userId12345")
 
-  responder.sendOk(res, {})
+  comeback.ok(res, {})
 
 }

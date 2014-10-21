@@ -1,10 +1,10 @@
 
+var comeback = require('comeback')
 var gcm = require('../util/gcm')
 var geo = require("../util/geo")
 var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
 var mongoUsers = require("../util/mongo_users")
-var responder = require('../util/response')
 var yelp = require("../util/yelp")
 
 /* READ THIS FIRST
@@ -34,7 +34,7 @@ module.exports = function(req, res) {
 
   if (!meetingId || !me || !lat || !lng) {
     logger.warn("Client supplied an illformatted PUT body. Sending 400.")
-    responder.sendBadRequest(res, "PUT body was not formatted correctly")
+    comeback.badRequest(res, "PUT body was not formatted correctly")
     return
   }
 
@@ -50,7 +50,7 @@ var onUserCreated = function(response, meetingId, userId) {
 
     if (err) {
       logger.error("Creating a user during join meeting failed in mongo. Sending 500")
-      responder.sendInternal(response)
+      comeback.internal(response, "")
       return
     }
 
@@ -67,19 +67,19 @@ var onGetMeeting = function(response, meetingId, userId) {
 
     if (err) {
       logger.error("Error getting meeting to update during user join. Sending 500.")
-      responder.sendInternal(response)
+      comeback.sendInternal(response, "")
       return
     }
 
     if (!result) {
       logger.warn("Requested meeting id does not exist in storage")
-      responder.sendNotFound(response, "No meeting by that id was found")
+      comeback.notFound(response, "No meeting by that id was found")
       return
     }
 
     if (result.members.length >= 2) {
       logger.warn("User " + userId + " tried to join a meeting that already has 2 members.")
-      responder.sendForbidden(response, "Meetings can only have two participants.")
+      comeback.forbidden(response, "Meetings can only have two participants.")
       return
     }
 
@@ -96,7 +96,7 @@ var onMemberAdded = function(response, meetingId, userId) {
 
     if (err) {
       logger.error("Error adding member to meeting in mongo. Sending 500.")
-      responder.sendInternal(response)
+      comeback.internal(response, "")
       return
     }
 
@@ -113,7 +113,7 @@ var onMidpointStored = function(response, meetingId, userId) {
 
     if (err) {
       logger.error("An error was thrown during midpoint calculation")
-      responder.sendInternal(response)
+      comeback.internal(response, "")
       return
     }
 
@@ -134,7 +134,7 @@ var onGetYelpBusinesses = function(response, meetingId, userId) {
         results = []
       } else {
         logger.error("An error was thrown during the yelp API call")
-        responder.sendInternal(response)
+        comeback.internal(response, "")
         return
       }
     }
@@ -158,7 +158,7 @@ var onTopLocationsSet = function(response, meetingId, userId) {
 
     if (err) {
       logger.error("Error setting top locations in mongo")
-      responder.sendInternal(response)
+      comeback.internal(response, "")
       return
     }
 
@@ -174,7 +174,7 @@ var onGetMeetingTwo = function(response, meetingId, userId) {
 
     if (err) {
       logger.error("Error thrown during get meeting 2 for user join meeting")
-      responder.sendInternal(response)
+      comeback.internal(response, "")
       return
     }
 
@@ -183,7 +183,7 @@ var onGetMeetingTwo = function(response, meetingId, userId) {
     gcm.sendUserJoined(gcmIds, userId)
 
     var obj = {"status": 202, "message": "Accepted"}
-    responder.sendAccepted(response, obj)
+    comeback.accepted(response, obj)
 
   }
 

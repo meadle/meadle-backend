@@ -1,9 +1,9 @@
 
+var comeback = require('comeback')
 var gcm = require("../util/gcm")
 var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
 var mongoUsers = require("../util/mongo_users")
-var responder = require("../util/response")
 
 module.exports = function(req, res) {
 
@@ -15,7 +15,7 @@ module.exports = function(req, res) {
 
   if (!meetingId || !userId || !votes) {
     logger.warn("Client supplied an illformatted PUT body. Sending 400.")
-    responder.sendBadRequest(res, "PUT body was not formatted correctly.")
+    comeback.badRequest(res, "PUT body was not formatted correctly")
     return
   }
 
@@ -30,13 +30,13 @@ var onGetMeeting = function(res, meetingId, userId, votes) {
 
     if (err) {
       logger.warn("Error getting meeting to update during user vote. Sending 500.")
-      responder.sendInternal(res)
+      comeback.internal(res, "")
       return
     }
 
     if (!result) {
       logger.warn("Client requested a meeting that does not exist")
-      responder.sendNotFound(res, "Meeting requested could not be found")
+      comeback.notFound(res, "Meeting requested could not be found")
       return
     }
 
@@ -44,7 +44,7 @@ var onGetMeeting = function(res, meetingId, userId, votes) {
     var members = result.members
     if (members.indexOf(userId) === -1) {
       logger.warn("The client is not authorized to vote on meeting " + meetingId + ", sending 401.")
-      responder.sendUnauthorized(res)
+      comeback.unauthorized(res, "")
       return
     }
 
@@ -74,7 +74,7 @@ var onSetTopLocations = function(res, meeting, userId, topLocations) {
 
     if (err) {
       loggeer.error("Error setting top locations for meetings in mongo")
-      responder.sendInternal(res)
+      comeback.internal(res, "")
       return
     }
 
@@ -102,7 +102,7 @@ var onFinalLocationSet = function(res, meeting, userId, meetingVotes, top) {
 
     if (err) {
       logger.error("Error setting final location in mongo")
-      responder.sendInternal(res)
+      comeback.internal(res, "")
       return
     }
 
@@ -119,7 +119,7 @@ var onNVotedIncrement = function(res, meeting, top) {
 
     if (err) {
       logger.error("Error incrementing nvoted in mongo")
-      responder.sendInternal(res)
+      comeback.internal(res, "")
       return
     }
 
@@ -129,7 +129,7 @@ var onNVotedIncrement = function(res, meeting, top) {
     }
 
     var obj = {'status': 202, 'message':'Accepted'}
-    responder.sendAccepted(res, obj)
+    comeback.accepted(res, obj)
 
   }
 
