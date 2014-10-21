@@ -1,8 +1,8 @@
 
+var comeback = require('comeback')
 var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
 var mongoUsers = require("../util/mongo_users")
-var responder = require("../util/response.js")
 
 module.exports = function(req, res) {
   logger.info("POST /meeting")
@@ -15,7 +15,7 @@ module.exports = function(req, res) {
 
   if (!me || !lat || !lng || !datetime) {
     logger.warn("Client supplied an illformatted POST body. Sending 400.")
-    responder.sendBadRequest(res, "POST body was not formatted correctly")
+    comeback.badRequest(res, "POST body was not formatted correctly")
     return
   }
 
@@ -38,7 +38,7 @@ var onMongoUserCreated = function(response, meetingId, datetime, userId) {
 
     if (err) {
       logger.error("Mongo threw an error while creating a user during meeting creation. Sending 500 to client.")
-      responder.sendInternal(response)
+      comeback.internal(response, "")
       return
     }
 
@@ -56,12 +56,12 @@ var onMongoMeetingCreated = function(response, meetingId) {
 
     if (err) {
       logger.error("Mongo threw an error while creating a meeting. Sending 500 to client.")
-      responder.sendInternal(response)
+      comeback.internal(response, "")
       return
     }
 
     var returnObj = {"meetingId": meetingId}
-    responder.sendCreated(response, returnObj)
+    comeback.created(response, returnObj)
 
   }
 

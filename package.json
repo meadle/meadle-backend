@@ -1,12 +1,14 @@
 {
   "name": "MeadleServer",
   "version": "0.0.1",
-  "repository" : {
-    "type" : "git",
-    "url" : "http://github.com/mhoc/meadle-backend"
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/mhoc/meadle-backend"
   },
   "dependencies": {
     "async": "*",
+    "chai-as-promised": "*",
+    "comeback": "^1.0.0",
     "expect": "^0.1.1",
     "express": "3.3.x",
     "log4js": "^0.6.21",
@@ -14,15 +16,14 @@
     "mongodb": "*",
     "mongoskin": "*",
     "nock": "^0.47.0",
+    "q": "*",
+    "request": "*",
     "should": "^4.0.4",
     "superagent": "^0.18.2",
     "supertest": "^0.13.0",
-    "yelp": "*",
-    "q": "*",
-    "chai-as-promised": "*",
-    "request": "*"
+    "yelp": "*"
   },
   "scripts": {
-	"test": "mocha"
+    "test": "mocha"
   }
 }
