@@ -44,3 +44,4 @@ Deploying Changes
 Commits to the master branch of this github repository will initiate our build process on codeship.io then automatically deploy to heroku on completion.
 
 Note that we have 100 builds per month on codeship. If you are just pushing to a development branch, please add `--skip-ci` to the commit message.
+deploy
