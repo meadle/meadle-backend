@@ -1,4 +1,5 @@
 
+var analytics = require('../logging/google_analytics')
 var comeback = require('comeback')
 var gcm = require('../util/gcm')
 var geo = require("../util/geo")
@@ -37,6 +38,9 @@ module.exports = function(req, res) {
     comeback.badRequest(res, "PUT body was not formatted correctly")
     return
   }
+
+  // Google analytics
+  analytics.hit(me, 'PUT /meeting/join')
 
   // Create the user in mongo
   var user = {"userId": me, "meetingId": meetingId, "lat": lat, "lng": lng}

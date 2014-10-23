@@ -1,4 +1,5 @@
 
+var analytics = require('../logging/google_analytics')
 var comeback = require('comeback')
 var gcm = require("../util/gcm")
 var logger = require("log4js").getLogger()
@@ -11,13 +12,15 @@ module.exports = function(req, res) {
   var meetingId = req.param("meetingId")
   var userId = req.param("userId")
   var votes = req.body.ranked
-  logger.info(votes)
 
   if (!meetingId || !userId || !votes) {
     logger.warn("Client supplied an illformatted PUT body. Sending 400.")
     comeback.badRequest(res, "PUT body was not formatted correctly")
     return
   }
+
+  // Analytics
+  analytics.hit(userId, 'PUT /meeting/vote')
 
   // Get the meeting object the user requested
   mongoMeetings.getMeeting(meetingId, onGetMeeting(res, meetingId, userId, votes))

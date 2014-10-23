@@ -1,4 +1,5 @@
 
+var analytics = require('../logging/google_analytics')
 var comeback = require('comeback')
 var logger = require("log4js").getLogger()
 var mongoMeetings = require("../util/mongo_meetings")
@@ -18,6 +19,9 @@ module.exports = function(req, res) {
     comeback.badRequest(res, "POST body was not formatted correctly")
     return
   }
+
+  // Post to analytics
+  analytics.hit(me, 'POST /meeting')
 
   // Generate a random meeting id
   var mida = []

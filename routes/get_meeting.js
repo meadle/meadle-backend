@@ -1,4 +1,5 @@
 
+var analytics = require('../logging/google_analytics')
 var comeback = require('comeback')
 var logger = require("log4js").getLogger()
 var meetingModel = require("../models/meeting")
@@ -12,6 +13,9 @@ module.exports = function(req, res) {
 
   // Extract the user Id
   var userId = req.param("userId")
+
+  // Send analytics
+  analytics.hit(userId, 'GET /meeting')
 
   // Validate it
   if (!meetingId || !userId) {

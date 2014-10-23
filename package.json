@@ -12,6 +12,7 @@
     "expect": "^0.1.1",
     "express": "3.3.x",
     "log4js": "^0.6.21",
+    "MD5": "*",
     "mocha": "^1.21.4",
     "mongodb": "*",
     "mongoskin": "*",
