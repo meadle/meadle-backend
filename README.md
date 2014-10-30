@@ -1,6 +1,8 @@
 
 [![Build Status](https://magnum.travis-ci.com/mhoc/meadle-backend.svg?token=noEZqHCNie4E6CC2GGKT&branch=master)](https://magnum.travis-ci.com/mhoc/meadle-backend)
 
+Deploying!!
+
 Pre-Reqs
 ========
 
